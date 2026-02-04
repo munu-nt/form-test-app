@@ -109,7 +109,6 @@ class _StaticImageViewState extends State<StaticImageView> {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
             setState(() {
-              _hasError = true;
               _isLoading = false;
             });
           }
