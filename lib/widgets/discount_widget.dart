@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../models.dart';
+
 class DiscountWidget extends StatefulWidget {
   final FieldModel field;
   final Function(String, dynamic) onValueChanged;
@@ -14,6 +15,7 @@ class DiscountWidget extends StatefulWidget {
   @override
   State<DiscountWidget> createState() => _DiscountWidgetState();
 }
+
 class _DiscountWidgetState extends State<DiscountWidget> {
   late TextEditingController _controller;
   String? _errorText;
@@ -26,18 +28,21 @@ class _DiscountWidgetState extends State<DiscountWidget> {
       _notifyValueChange();
     });
   }
+
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
   }
+
   void _notifyValueChange() {
     final value = double.tryParse(_controller.text) ?? 0.0;
     widget.onValueChanged(widget.field.fieldId, value);
   }
+
   String? _validate(String? value) {
     if (value == null || value.isEmpty) {
-      return null;  
+      return null;
     }
     final parsed = double.tryParse(value);
     if (parsed == null) {
@@ -48,6 +53,7 @@ class _DiscountWidgetState extends State<DiscountWidget> {
     }
     return null;
   }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -98,7 +104,9 @@ class _DiscountWidgetState extends State<DiscountWidget> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 filled: true,
-                fillColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                fillColor: theme.colorScheme.surfaceContainerHighest.withValues(
+                  alpha: 0.3,
+                ),
               ),
               readOnly: widget.field.isReadOnly,
               validator: _validate,
@@ -111,7 +119,8 @@ class _DiscountWidgetState extends State<DiscountWidget> {
                 }
               },
             ),
-            if (widget.field.fieldValue != null && widget.field.fieldValue!.isNotEmpty)
+            if (widget.field.fieldValue != null &&
+                widget.field.fieldValue!.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.only(top: 8.0),
                 child: Text(

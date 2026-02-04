@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models.dart';
+
 class MultiWebUrlWidget extends StatefulWidget {
   final FieldModel field;
   final Function(String, dynamic) onValueChanged;
@@ -11,6 +12,7 @@ class MultiWebUrlWidget extends StatefulWidget {
   @override
   State<MultiWebUrlWidget> createState() => _MultiWebUrlWidgetState();
 }
+
 class _MultiWebUrlWidgetState extends State<MultiWebUrlWidget> {
   final List<TextEditingController> _controllers = [];
   @override
@@ -18,6 +20,7 @@ class _MultiWebUrlWidgetState extends State<MultiWebUrlWidget> {
     super.initState();
     _addUrlField();
   }
+
   void _addUrlField([String text = '']) {
     final ctrl = TextEditingController(text: text);
     ctrl.addListener(_updateValue);
@@ -25,10 +28,11 @@ class _MultiWebUrlWidgetState extends State<MultiWebUrlWidget> {
       _controllers.add(ctrl);
     });
   }
+
   void _removeUrlField(int index) {
     if (_controllers.length <= 1) {
-       _controllers[0].clear();  
-       return;
+      _controllers[0].clear();
+      return;
     }
     _controllers[index].removeListener(_updateValue);
     _controllers[index].dispose();
@@ -37,10 +41,15 @@ class _MultiWebUrlWidgetState extends State<MultiWebUrlWidget> {
     });
     _updateValue();
   }
+
   void _updateValue() {
-     final urls = _controllers.map((c) => c.text.trim()).where((s) => s.isNotEmpty).toList();
-     widget.onValueChanged(widget.field.fieldId, urls.join(','));
+    final urls = _controllers
+        .map((c) => c.text.trim())
+        .where((s) => s.isNotEmpty)
+        .toList();
+    widget.onValueChanged(widget.field.fieldId, urls.join(','));
   }
+
   @override
   void dispose() {
     for (var c in _controllers) {
@@ -48,6 +57,7 @@ class _MultiWebUrlWidgetState extends State<MultiWebUrlWidget> {
     }
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -57,30 +67,36 @@ class _MultiWebUrlWidgetState extends State<MultiWebUrlWidget> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(widget.field.fieldName, style: Theme.of(context).textTheme.titleMedium),
+            Text(
+              widget.field.fieldName,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
             const SizedBox(height: 8),
             ...List.generate(_controllers.length, (index) {
-               return Padding(
-                 padding: const EdgeInsets.only(bottom: 8.0),
-                 child: Row(
-                   children: [
-                     Expanded(
-                       child: TextFormField(
-                         controller: _controllers[index],
-                         decoration: InputDecoration(
-                           labelText: 'URL ${index + 1}',
-                           prefixIcon: const Icon(Icons.link),
-                         ),
-                       ),
-                     ),
-                     if (_controllers.length > 1)
-                       IconButton(
-                         icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
-                         onPressed: () => _removeUrlField(index),
-                       ),
-                   ],
-                 ),
-               );
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        controller: _controllers[index],
+                        decoration: InputDecoration(
+                          labelText: 'URL ${index + 1}',
+                          prefixIcon: const Icon(Icons.link),
+                        ),
+                      ),
+                    ),
+                    if (_controllers.length > 1)
+                      IconButton(
+                        icon: const Icon(
+                          Icons.remove_circle_outline,
+                          color: Colors.red,
+                        ),
+                        onPressed: () => _removeUrlField(index),
+                      ),
+                  ],
+                ),
+              );
             }),
             TextButton.icon(
               onPressed: () => _addUrlField(),

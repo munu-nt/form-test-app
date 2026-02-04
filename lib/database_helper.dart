@@ -37,11 +37,10 @@ class DatabaseHelper {
       await txn.delete(_tableName);
       for (final entry in formData.entries) {
         final valueStr = json.encode(entry.value);
-        await txn.insert(
-          _tableName,
-          {'field_id': entry.key, 'value': valueStr},
-          conflictAlgorithm: ConflictAlgorithm.replace,
-        );
+        await txn.insert(_tableName, {
+          'field_id': entry.key,
+          'value': valueStr,
+        }, conflictAlgorithm: ConflictAlgorithm.replace);
       }
     });
   }

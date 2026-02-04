@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:uuid/uuid.dart';
 import '../models.dart';
+
 class FileUploadWidget extends StatefulWidget {
   final FieldModel field;
   final Function(String, dynamic) onValueChanged;
@@ -13,6 +14,7 @@ class FileUploadWidget extends StatefulWidget {
   @override
   State<FileUploadWidget> createState() => _FileUploadWidgetState();
 }
+
 class _FileUploadWidgetState extends State<FileUploadWidget> {
   MediaFile? _selectedFile;
   final _uuid = const Uuid();
@@ -40,6 +42,7 @@ class _FileUploadWidgetState extends State<FileUploadWidget> {
       _showError('Failed to pick file: $e');
     }
   }
+
   Future<void> _simulateUpload(MediaFile file) async {
     for (int i = 0; i <= 100; i += 10) {
       await Future.delayed(const Duration(milliseconds: 100));
@@ -54,6 +57,7 @@ class _FileUploadWidgetState extends State<FileUploadWidget> {
     }
     _notifyValue();
   }
+
   void _notifyValue() {
     if (_selectedFile != null && _selectedFile!.isUploaded) {
       widget.onValueChanged(widget.field.fieldId, {
@@ -64,18 +68,21 @@ class _FileUploadWidgetState extends State<FileUploadWidget> {
       });
     }
   }
+
   void _removeFile() {
     setState(() {
       _selectedFile = null;
     });
     widget.onValueChanged(widget.field.fieldId, null);
   }
+
   void _showError(String message) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: Colors.red),
     );
   }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -103,6 +110,7 @@ class _FileUploadWidgetState extends State<FileUploadWidget> {
       ),
     );
   }
+
   Widget _buildUploadArea(ThemeData theme) {
     return InkWell(
       onTap: _pickFile,
@@ -115,7 +123,9 @@ class _FileUploadWidgetState extends State<FileUploadWidget> {
             style: BorderStyle.solid,
           ),
           borderRadius: BorderRadius.circular(12),
-          color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+          color: theme.colorScheme.surfaceContainerHighest.withValues(
+            alpha: 0.3,
+          ),
         ),
         child: Column(
           children: [
@@ -125,10 +135,7 @@ class _FileUploadWidgetState extends State<FileUploadWidget> {
               color: theme.colorScheme.primary,
             ),
             const SizedBox(height: 12),
-            Text(
-              'Tap to select a file',
-              style: theme.textTheme.bodyLarge,
-            ),
+            Text('Tap to select a file', style: theme.textTheme.bodyLarge),
             const SizedBox(height: 4),
             Text(
               'Supports all file types',
@@ -141,6 +148,7 @@ class _FileUploadWidgetState extends State<FileUploadWidget> {
       ),
     );
   }
+
   Widget _buildFilePreview(ThemeData theme) {
     final file = _selectedFile!;
     return Container(
@@ -197,7 +205,7 @@ class _FileUploadWidgetState extends State<FileUploadWidget> {
                   ),
                 )
               else if (file.isUploaded)
-                Icon(Icons.check_circle, color: Colors.green)
+                const Icon(Icons.check_circle, color: Colors.green)
               else if (file.errorMessage != null)
                 IconButton(
                   icon: Icon(Icons.refresh, color: theme.colorScheme.error),
@@ -229,6 +237,7 @@ class _FileUploadWidgetState extends State<FileUploadWidget> {
       ),
     );
   }
+
   IconData _getFileIcon(String? extension) {
     switch (extension?.toLowerCase()) {
       case 'pdf':

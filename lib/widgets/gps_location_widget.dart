@@ -4,6 +4,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import '../models.dart';
+
 class GpsLocationWidget extends StatefulWidget {
   final FieldModel field;
   final Function(String, dynamic) onValueChanged;
@@ -15,6 +16,7 @@ class GpsLocationWidget extends StatefulWidget {
   @override
   State<GpsLocationWidget> createState() => _GpsLocationWidgetState();
 }
+
 class _GpsLocationWidgetState extends State<GpsLocationWidget> {
   LocationData? _location;
   bool _isLoading = false;
@@ -29,6 +31,7 @@ class _GpsLocationWidgetState extends State<GpsLocationWidget> {
       _checkPermission();
     });
   }
+
   Future<void> _checkPermission() async {
     try {
       final permission = await Geolocator.checkPermission();
@@ -40,6 +43,7 @@ class _GpsLocationWidgetState extends State<GpsLocationWidget> {
       debugPrint('Check permission error: $e');
     }
   }
+
   Future<void> _requestPermission() async {
     if (_isLoading) return;
     setState(() {
@@ -51,7 +55,8 @@ class _GpsLocationWidgetState extends State<GpsLocationWidget> {
       if (!mounted) return;
       if (!serviceEnabled) {
         setState(() {
-          _errorMessage = 'Location services are disabled. Please enable them in settings.';
+          _errorMessage =
+              'Location services are disabled. Please enable them in settings.';
           _isLoading = false;
         });
         return;
@@ -73,7 +78,8 @@ class _GpsLocationWidgetState extends State<GpsLocationWidget> {
       }
       if (permission == LocationPermission.deniedForever) {
         setState(() {
-          _errorMessage = 'Location permissions are permanently denied. Please enable in app settings.';
+          _errorMessage =
+              'Location permissions are permanently denied. Please enable in app settings.';
           _permission = permission;
           _isLoading = false;
         });
@@ -93,6 +99,7 @@ class _GpsLocationWidgetState extends State<GpsLocationWidget> {
       });
     }
   }
+
   Future<void> _getCurrentLocation() async {
     setState(() {
       _isLoading = true;
@@ -146,7 +153,10 @@ class _GpsLocationWidgetState extends State<GpsLocationWidget> {
       });
       widget.onValueChanged(widget.field.fieldId, locationData.toJson());
       if (_isMapReady) {
-        _mapController.move(LatLng(position.latitude, position.longitude), 15.0);
+        _mapController.move(
+          LatLng(position.latitude, position.longitude),
+          15.0,
+        );
       }
     } catch (e) {
       if (!mounted) return;
@@ -156,6 +166,7 @@ class _GpsLocationWidgetState extends State<GpsLocationWidget> {
       });
     }
   }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -171,7 +182,12 @@ class _GpsLocationWidgetState extends State<GpsLocationWidget> {
               children: [
                 Icon(Icons.location_on, color: theme.colorScheme.primary),
                 const SizedBox(width: 8),
-                Expanded(child: Text(widget.field.fieldName, style: theme.textTheme.titleMedium)),
+                Expanded(
+                  child: Text(
+                    widget.field.fieldName,
+                    style: theme.textTheme.titleMedium,
+                  ),
+                ),
                 if (_isLoading)
                   const SizedBox(
                     width: 20,
@@ -191,6 +207,7 @@ class _GpsLocationWidgetState extends State<GpsLocationWidget> {
       ),
     );
   }
+
   Widget _buildLocationContent(ThemeData theme) {
     final latLng = LatLng(_location!.latitude, _location!.longitude);
     return Column(
@@ -202,7 +219,9 @@ class _GpsLocationWidgetState extends State<GpsLocationWidget> {
             options: MapOptions(
               initialCenter: latLng,
               initialZoom: 15.0,
-              interactionOptions: const InteractionOptions(flags: InteractiveFlag.none),
+              interactionOptions: const InteractionOptions(
+                flags: InteractiveFlag.none,
+              ),
               onMapReady: () {
                 _isMapReady = true;
               },
@@ -237,14 +256,18 @@ class _GpsLocationWidgetState extends State<GpsLocationWidget> {
               if (_location!.address != null) ...[
                 Text(
                   'Address',
-                  style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.outline),
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.colorScheme.outline,
+                  ),
                 ),
                 Text(_location!.address!, style: theme.textTheme.bodyMedium),
                 const SizedBox(height: 8),
               ],
               Text(
                 'Lat: ${_location!.latitude.toStringAsFixed(6)}, Lng: ${_location!.longitude.toStringAsFixed(6)}',
-                style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.outline),
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.outline,
+                ),
               ),
               const SizedBox(height: 12),
               Center(
@@ -260,12 +283,16 @@ class _GpsLocationWidgetState extends State<GpsLocationWidget> {
       ],
     );
   }
+
   Widget _buildErrorState(ThemeData theme) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
-          Text(_errorMessage!, style: TextStyle(color: theme.colorScheme.error)),
+          Text(
+            _errorMessage!,
+            style: TextStyle(color: theme.colorScheme.error),
+          ),
           const SizedBox(height: 8),
           FilledButton.tonal(
             onPressed: _requestPermission,
@@ -275,13 +302,18 @@ class _GpsLocationWidgetState extends State<GpsLocationWidget> {
       ),
     );
   }
+
   Widget _buildInitialState(ThemeData theme) {
     return Padding(
       padding: const EdgeInsets.all(24.0),
       child: Center(
         child: Column(
           children: [
-            Icon(Icons.location_searching, size: 48, color: theme.colorScheme.outline),
+            Icon(
+              Icons.location_searching,
+              size: 48,
+              color: theme.colorScheme.outline,
+            ),
             const SizedBox(height: 16),
             FilledButton(
               onPressed: _requestPermission,

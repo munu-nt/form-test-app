@@ -1,16 +1,14 @@
 import 'dart:convert';
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import '../models.dart';
+
 class StaticImageView extends StatefulWidget {
   final FieldModel field;
-  const StaticImageView({
-    super.key,
-    required this.field,
-  });
+  const StaticImageView({super.key, required this.field});
   @override
   State<StaticImageView> createState() => _StaticImageViewState();
 }
+
 class _StaticImageViewState extends State<StaticImageView> {
   bool _isLoading = true;
   bool _hasError = false;
@@ -60,7 +58,11 @@ class _StaticImageViewState extends State<StaticImageView> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Icon(Icons.zoom_in, color: Colors.white.withValues(alpha: 0.8), size: 18),
+                      Icon(
+                        Icons.zoom_in,
+                        color: Colors.white.withValues(alpha: 0.8),
+                        size: 18,
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         'Tap to zoom',
@@ -80,6 +82,7 @@ class _StaticImageViewState extends State<StaticImageView> {
       ),
     );
   }
+
   Widget _buildImageContent(String imageUrl) {
     if (imageUrl.startsWith('data:image/')) {
       return _buildBase64(imageUrl);
@@ -89,6 +92,7 @@ class _StaticImageViewState extends State<StaticImageView> {
       return _buildNetwork(imageUrl);
     }
   }
+
   Widget _buildNetwork(String url) {
     return Image.network(
       url,
@@ -104,12 +108,18 @@ class _StaticImageViewState extends State<StaticImageView> {
       },
       errorBuilder: (_, __, ___) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) setState(() { _hasError = true; _isLoading = false; });
+          if (mounted) {
+            setState(() {
+              _hasError = true;
+              _isLoading = false;
+            });
+          }
         });
         return _buildErrorContent();
       },
     );
   }
+
   Widget _buildAsset(String path) {
     return Image.asset(
       path,
@@ -117,6 +127,7 @@ class _StaticImageViewState extends State<StaticImageView> {
       errorBuilder: (_, __, ___) => _buildErrorContent(),
     );
   }
+
   Widget _buildBase64(String data) {
     try {
       final bytes = base64Decode(data.split(',').last);
@@ -125,44 +136,72 @@ class _StaticImageViewState extends State<StaticImageView> {
       return _buildErrorContent();
     }
   }
+
   Widget _buildLoadingOverlay() {
     return Container(
       color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.8),
       child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
     );
   }
+
   Widget _buildErrorContent() {
     return Container(
-      color: Theme.of(context).colorScheme.errorContainer.withValues(alpha: 0.3),
+      color: Theme.of(
+        context,
+      ).colorScheme.errorContainer.withValues(alpha: 0.3),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.broken_image, size: 32, color: Theme.of(context).colorScheme.error),
+          Icon(
+            Icons.broken_image,
+            size: 32,
+            color: Theme.of(context).colorScheme.error,
+          ),
           const SizedBox(height: 4),
-          Text('Failed to load', style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.error)),
+          Text(
+            'Failed to load',
+            style: TextStyle(
+              fontSize: 12,
+              color: Theme.of(context).colorScheme.error,
+            ),
+          ),
         ],
       ),
     );
   }
+
   Widget _buildCompactPlaceholder() {
     return Container(
       height: 100,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+        color: Theme.of(
+          context,
+        ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
       ),
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.image, size: 28, color: Theme.of(context).colorScheme.outline),
+            Icon(
+              Icons.image,
+              size: 28,
+              color: Theme.of(context).colorScheme.outline,
+            ),
             const SizedBox(height: 4),
-            Text('No image', style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.outline)),
+            Text(
+              'No image',
+              style: TextStyle(
+                fontSize: 12,
+                color: Theme.of(context).colorScheme.outline,
+              ),
+            ),
           ],
         ),
       ),
     );
   }
+
   void _showFullScreen(BuildContext context, String imageUrl) {
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -175,6 +214,7 @@ class _StaticImageViewState extends State<StaticImageView> {
     );
   }
 }
+
 class _FullScreenViewer extends StatelessWidget {
   final String imageUrl;
   final String title;
@@ -202,6 +242,7 @@ class _FullScreenViewer extends StatelessWidget {
       ),
     );
   }
+
   Widget _buildImage() {
     if (imageUrl.startsWith('data:image/')) {
       try {
@@ -220,6 +261,7 @@ class _FullScreenViewer extends StatelessWidget {
       );
     }
   }
+
   Widget _buildError() {
     return const Column(
       mainAxisAlignment: MainAxisAlignment.center,

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../models.dart';
+
 class PaymentSummaryWidget extends StatelessWidget {
   final FieldModel field;
   final Map<String, dynamic> formData;
@@ -22,6 +23,7 @@ class PaymentSummaryWidget extends StatelessWidget {
     }
     return PaymentConfig();
   }
+
   double _calculateSubtotal() {
     double subtotal = 0.0;
     for (final field in allFields) {
@@ -44,7 +46,9 @@ class PaymentSummaryWidget extends StatelessWidget {
               if (option.paymentAmount != null) {
                 amount = double.tryParse(option.paymentAmount!) ?? 0.0;
               } else {
-                final priceMatch = RegExp(r'[\$£€](\d+(?:\.\d{2})?)').firstMatch(option.text);
+                final priceMatch = RegExp(
+                  r'[\$£€](\d+(?:\.\d{2})?)',
+                ).firstMatch(option.text);
                 if (priceMatch != null) {
                   amount = double.tryParse(priceMatch.group(1)!) ?? 0.0;
                 }
@@ -57,6 +61,7 @@ class PaymentSummaryWidget extends StatelessWidget {
     }
     return subtotal;
   }
+
   double _getDiscount() {
     for (final field in allFields) {
       if (field.fieldType == 'Discount') {
@@ -64,12 +69,15 @@ class PaymentSummaryWidget extends StatelessWidget {
         if (discountValue != null) {
           if (discountValue is double) return discountValue;
           if (discountValue is int) return discountValue.toDouble();
-          if (discountValue is String) return double.tryParse(discountValue) ?? 0.0;
+          if (discountValue is String) {
+            return double.tryParse(discountValue) ?? 0.0;
+          }
         }
       }
     }
     return 0.0;
   }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -79,9 +87,7 @@ class PaymentSummaryWidget extends StatelessWidget {
     final total = (subtotal - discount).clamp(0.0, double.infinity);
     return Card(
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
@@ -155,7 +161,10 @@ class PaymentSummaryWidget extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(top: 12),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     color: theme.colorScheme.tertiaryContainer,
                     borderRadius: BorderRadius.circular(8),
@@ -185,6 +194,7 @@ class PaymentSummaryWidget extends StatelessWidget {
       ),
     );
   }
+
   Widget _buildSummaryRow(
     BuildContext context, {
     required String label,
@@ -194,7 +204,8 @@ class PaymentSummaryWidget extends StatelessWidget {
     bool isDiscount = false,
   }) {
     final theme = Theme.of(context);
-    final valueText = '${isDiscount ? '-' : ''}$currencyType${value.abs().toStringAsFixed(2)}';
+    final valueText =
+        '${isDiscount ? '-' : ''}$currencyType${value.abs().toStringAsFixed(2)}';
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -206,7 +217,9 @@ class PaymentSummaryWidget extends StatelessWidget {
                   color: theme.colorScheme.onPrimaryContainer,
                 )
               : theme.textTheme.bodyLarge?.copyWith(
-                  color: theme.colorScheme.onPrimaryContainer.withValues(alpha: 0.8),
+                  color: theme.colorScheme.onPrimaryContainer.withValues(
+                    alpha: 0.8,
+                  ),
                 ),
         ),
         Text(
@@ -218,8 +231,8 @@ class PaymentSummaryWidget extends StatelessWidget {
                 )
               : theme.textTheme.bodyLarge?.copyWith(
                   fontWeight: FontWeight.w500,
-                  color: isDiscount 
-                      ? theme.colorScheme.error 
+                  color: isDiscount
+                      ? theme.colorScheme.error
                       : theme.colorScheme.onPrimaryContainer,
                 ),
         ),

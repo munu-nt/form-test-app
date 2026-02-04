@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+
 class FormModel {
   final bool status;
   final String? errorType;
@@ -22,24 +23,25 @@ class FormModel {
       formCategory: json['FormCategory'],
       buttonType: json['ButtonType'],
       fields: (json['Fields'] as List).map((i) {
-            try {
-              return FieldModel.fromJson(i);
-            } catch (e) {
-              print('Error parsing field: ${i['FieldID']} - ${i['FieldName']}');
-              print('Error details: $e');
-              return FieldModel(
-                 fieldId: i['FieldID']?.toString() ?? 'error',
-                 fieldName: 'Error Parsing Field',
-                 fieldType: 'Error',
-                 isMandate: false,
-                 isReadOnly: true, 
-                 hideField: true,  
-              );
-            }
-          }).toList(),
+        try {
+          return FieldModel.fromJson(i);
+        } catch (e) {
+          print('Error parsing field: ${i['FieldID']} - ${i['FieldName']}');
+          print('Error details: $e');
+          return FieldModel(
+            fieldId: i['FieldID']?.toString() ?? 'error',
+            fieldName: 'Error Parsing Field',
+            fieldType: 'Error',
+            isMandate: false,
+            isReadOnly: true,
+            hideField: true,
+          );
+        }
+      }).toList(),
     );
   }
 }
+
 class FieldModel {
   final String fieldId;
   final String fieldName;
@@ -142,13 +144,11 @@ class FieldModel {
       if (list.isNotEmpty) {
         try {
           if (list[0] is List) {
-             subFields = (list[0] as List)
-                 .map((i) => FieldModel.fromJson(i))
-                 .toList();
+            subFields = (list[0] as List)
+                .map((i) => FieldModel.fromJson(i))
+                .toList();
           } else {
-             subFields = list
-                 .map((i) => FieldModel.fromJson(i))
-                 .toList();
+            subFields = list.map((i) => FieldModel.fromJson(i)).toList();
           }
         } catch (e) {
           debugPrint('Error parsing SubFieldList for ${json['FieldID']}: $e');
@@ -168,18 +168,18 @@ class FieldModel {
           : null,
       fieldOptions: json['FieldOptions'] != null
           ? (json['FieldOptions'] as List)
-              .map((i) => FieldOptionModel.fromJson(i))
-              .toList()
+                .map((i) => FieldOptionModel.fromJson(i))
+                .toList()
           : null,
       isReadOnly: json['IsReadOnly'] ?? false,
       hideField: json['HideField'] ?? false,
       fieldDescription: json['FieldDescription'],
       isGroupedField: json['IsGroupedField'] ?? false,
-      maxGroupLimit: json['MaxGroupLimit'] != null 
-          ? int.tryParse(json['MaxGroupLimit'].toString()) 
+      maxGroupLimit: json['MaxGroupLimit'] != null
+          ? int.tryParse(json['MaxGroupLimit'].toString())
           : null,
-      minGroupRequired: json['MinGroupRequired'] != null 
-          ? int.tryParse(json['MinGroupRequired'].toString()) 
+      minGroupRequired: json['MinGroupRequired'] != null
+          ? int.tryParse(json['MinGroupRequired'].toString())
           : null,
       groupId: json['GroupId'],
       groupSequence: json['GroupSequence'] != null
@@ -191,8 +191,8 @@ class FieldModel {
           : null,
       fieldDependencyConfig: json['FieldDependencyConfig'] != null
           ? (json['FieldDependencyConfig'] as List)
-              .map((i) => FieldDependencyConfig.fromJson(i))
-              .toList()
+                .map((i) => FieldDependencyConfig.fromJson(i))
+                .toList()
           : null,
       isDependent: json['IsDependent'] ?? false,
       formula: json['Formula'],
@@ -220,13 +220,14 @@ class FieldModel {
       additionalFieldConfig: json['AdditionalFieldConfig'] is List
           ? json['AdditionalFieldConfig']
           : (json['AdditionalFieldConfig'] != null
-              ? [json['AdditionalFieldConfig']]
-              : null),
+                ? [json['AdditionalFieldConfig']]
+                : null),
       maxOptionSelection: json['MaxOptionSelection'],
       prepopulateValue: json['PrepopulateValue'],
     );
   }
 }
+
 class FieldOptionModel {
   final String value;
   final String text;
@@ -255,6 +256,7 @@ class FieldOptionModel {
     );
   }
 }
+
 class FieldDependencyConfig {
   final String dependencyType;
   final String dependencyTypeId;
@@ -282,6 +284,7 @@ class FieldDependencyConfig {
     return dependencyTypeId.split(',').map((e) => e.trim()).toList();
   }
 }
+
 class GroupInstance {
   final String id;
   final Map<String, dynamic> data;
@@ -303,6 +306,7 @@ class GroupInstance {
     );
   }
 }
+
 class CalendarConfig {
   final String? limitType;
   final String? minDate;
@@ -338,6 +342,7 @@ class CalendarConfig {
     );
   }
 }
+
 class RestrictedDates {
   final List<String>? customDates;
   final List<int>? daysOfMonths;
@@ -355,17 +360,24 @@ class RestrictedDates {
           ? List<String>.from(json['CustomDates'])
           : null,
       daysOfMonths: json['DaysOfMonths'] != null
-          ? List<int>.from(json['DaysOfMonths'].map((e) => int.tryParse(e.toString()) ?? e))
+          ? List<int>.from(
+              json['DaysOfMonths'].map((e) => int.tryParse(e.toString()) ?? e),
+            )
           : null,
       months: json['Months'] != null
-          ? List<int>.from(json['Months'].map((e) => int.tryParse(e.toString()) ?? e))
+          ? List<int>.from(
+              json['Months'].map((e) => int.tryParse(e.toString()) ?? e),
+            )
           : null,
       weekDays: json['WeekDays'] != null
-          ? List<int>.from(json['WeekDays'].map((e) => int.tryParse(e.toString()) ?? e))
+          ? List<int>.from(
+              json['WeekDays'].map((e) => int.tryParse(e.toString()) ?? e),
+            )
           : null,
     );
   }
 }
+
 class AppointmentSlot {
   final String id;
   final String time;
@@ -383,12 +395,14 @@ class AppointmentSlot {
     return AppointmentSlot(
       id: json['Id'] ?? json['id'] ?? '',
       time: json['Time'] ?? json['time'] ?? '',
-      availableSeats: int.tryParse(json['AvailableSeats']?.toString() ?? '0') ?? 0,
+      availableSeats:
+          int.tryParse(json['AvailableSeats']?.toString() ?? '0') ?? 0,
       maxSeats: int.tryParse(json['MaxSeats']?.toString() ?? '1') ?? 1,
       isAvailable: json['IsAvailable'] ?? json['isAvailable'] ?? true,
     );
   }
 }
+
 class LocationData {
   final double latitude;
   final double longitude;
@@ -414,6 +428,7 @@ class LocationData {
       'postalCode': postalCode,
     };
   }
+
   @override
   String toString() {
     if (address != null && address!.isNotEmpty) {
@@ -422,6 +437,7 @@ class LocationData {
     return '$latitude, $longitude';
   }
 }
+
 class MediaFile {
   final String id;
   final String name;
@@ -470,13 +486,17 @@ class MediaFile {
       thumbnailPath: thumbnailPath ?? this.thumbnailPath,
     );
   }
+
   String get formattedSize {
     if (sizeBytes == null) return '';
     if (sizeBytes! < 1024) return '$sizeBytes B';
-    if (sizeBytes! < 1024 * 1024) return '${(sizeBytes! / 1024).toStringAsFixed(1)} KB';
+    if (sizeBytes! < 1024 * 1024) {
+      return '${(sizeBytes! / 1024).toStringAsFixed(1)} KB';
+    }
     return '${(sizeBytes! / (1024 * 1024)).toStringAsFixed(1)} MB';
   }
 }
+
 class PaymentConfig {
   final String amountPayableLabel;
   final String discountLabel;
@@ -509,6 +529,7 @@ class PaymentConfig {
     );
   }
 }
+
 class PriceCalculationItem {
   final String priceCalculationId;
   final String name;
@@ -532,16 +553,17 @@ class PriceCalculationItem {
       name: json['Name'] ?? '',
       fieldId: json['FieldId'] ?? '',
       fieldName: json['FieldName'] ?? '',
-      fieldValues: json['FieldValues'] != null 
-          ? List<String>.from(json['FieldValues']) 
+      fieldValues: json['FieldValues'] != null
+          ? List<String>.from(json['FieldValues'])
           : [],
-      fieldOptionTexts: json['FieldOptionTexts'] != null 
-          ? List<String>.from(json['FieldOptionTexts']) 
+      fieldOptionTexts: json['FieldOptionTexts'] != null
+          ? List<String>.from(json['FieldOptionTexts'])
           : [],
       sequence: json['Sequence'] ?? 0,
     );
   }
 }
+
 class SequenceNumberConfig {
   final int startingNumber;
   final int startingNumberLength;

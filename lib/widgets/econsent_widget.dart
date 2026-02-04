@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import '../models.dart';
+
 class EConsentWidget extends StatefulWidget {
   final FieldModel field;
   final Function(String, dynamic) onValueChanged;
@@ -12,6 +13,7 @@ class EConsentWidget extends StatefulWidget {
   @override
   State<EConsentWidget> createState() => _EConsentWidgetState();
 }
+
 class _EConsentWidgetState extends State<EConsentWidget> {
   final ScrollController _scrollController = ScrollController();
   bool _hasScrolledToBottom = false;
@@ -25,6 +27,7 @@ class _EConsentWidgetState extends State<EConsentWidget> {
       </p>
     ''';
   }
+
   @override
   void initState() {
     super.initState();
@@ -33,6 +36,7 @@ class _EConsentWidgetState extends State<EConsentWidget> {
       _checkInitialScrollState();
     });
   }
+
   void _checkInitialScrollState() {
     if (_scrollController.hasClients) {
       final maxScroll = _scrollController.position.maxScrollExtent;
@@ -43,6 +47,7 @@ class _EConsentWidgetState extends State<EConsentWidget> {
       }
     }
   }
+
   void _onScroll() {
     if (_hasScrolledToBottom) return;
     final maxScroll = _scrollController.position.maxScrollExtent;
@@ -53,12 +58,14 @@ class _EConsentWidgetState extends State<EConsentWidget> {
       });
     }
   }
+
   @override
   void dispose() {
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     super.dispose();
   }
+
   void _onAcceptChanged(bool? value) {
     if (!_hasScrolledToBottom) return;
     setState(() {
@@ -69,6 +76,7 @@ class _EConsentWidgetState extends State<EConsentWidget> {
       _isAccepted ? 'accepted' : null,
     );
   }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -77,8 +85,8 @@ class _EConsentWidgetState extends State<EConsentWidget> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(
-          color: _isAccepted 
-              ? theme.colorScheme.primary 
+          color: _isAccepted
+              ? theme.colorScheme.primary
               : theme.colorScheme.outline.withValues(alpha: 0.3),
           width: _isAccepted ? 2 : 1,
         ),
@@ -124,7 +132,10 @@ class _EConsentWidgetState extends State<EConsentWidget> {
                 ),
                 if (_hasScrolledToBottom)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: theme.colorScheme.primaryContainer,
                       borderRadius: BorderRadius.circular(12),
@@ -153,7 +164,9 @@ class _EConsentWidgetState extends State<EConsentWidget> {
             Container(
               height: 200,
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                color: theme.colorScheme.surfaceContainerHighest.withValues(
+                  alpha: 0.3,
+                ),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: theme.colorScheme.outline.withValues(alpha: 0.2),
@@ -181,7 +194,8 @@ class _EConsentWidgetState extends State<EConsentWidget> {
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
                             colors: [
-                              theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.0),
+                              theme.colorScheme.surfaceContainerHighest
+                                  .withValues(alpha: 0.0),
                               theme.colorScheme.surfaceContainerHighest,
                             ],
                           ),
@@ -223,8 +237,8 @@ class _EConsentWidgetState extends State<EConsentWidget> {
                   text: TextSpan(
                     text: 'I have read and agree to the terms and conditions',
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: _hasScrolledToBottom 
-                          ? theme.colorScheme.onSurface 
+                      color: _hasScrolledToBottom
+                          ? theme.colorScheme.onSurface
                           : theme.colorScheme.onSurface.withValues(alpha: 0.5),
                     ),
                     children: widget.field.isMandate

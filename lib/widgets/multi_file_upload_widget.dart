@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:uuid/uuid.dart';
 import '../models.dart';
+
 class MultiFileUploadWidget extends StatefulWidget {
   final FieldModel field;
   final Function(String, dynamic) onValueChanged;
@@ -13,6 +14,7 @@ class MultiFileUploadWidget extends StatefulWidget {
   @override
   State<MultiFileUploadWidget> createState() => _MultiFileUploadWidgetState();
 }
+
 class _MultiFileUploadWidgetState extends State<MultiFileUploadWidget> {
   final List<MediaFile> _files = [];
   final _uuid = const Uuid();
@@ -47,6 +49,7 @@ class _MultiFileUploadWidgetState extends State<MultiFileUploadWidget> {
       _showError('Failed to pick files: $e');
     }
   }
+
   Future<void> _simulateUpload(MediaFile file) async {
     final index = _files.indexWhere((f) => f.id == file.id);
     if (index == -1) return;
@@ -54,7 +57,7 @@ class _MultiFileUploadWidgetState extends State<MultiFileUploadWidget> {
       await Future.delayed(const Duration(milliseconds: 80));
       if (!mounted) return;
       final currentIndex = _files.indexWhere((f) => f.id == file.id);
-      if (currentIndex == -1) return;  
+      if (currentIndex == -1) return;
       setState(() {
         _files[currentIndex] = file.copyWith(
           uploadProgress: i / 100,
@@ -65,30 +68,36 @@ class _MultiFileUploadWidgetState extends State<MultiFileUploadWidget> {
     }
     _notifyValue();
   }
+
   void _notifyValue() {
     final uploadedFiles = _files
         .where((f) => f.isUploaded)
-        .map((f) => {
-              'name': f.name,
-              'path': f.path,
-              'size': f.sizeBytes,
-              'mimeType': f.mimeType,
-            })
+        .map(
+          (f) => {
+            'name': f.name,
+            'path': f.path,
+            'size': f.sizeBytes,
+            'mimeType': f.mimeType,
+          },
+        )
         .toList();
     widget.onValueChanged(widget.field.fieldId, uploadedFiles);
   }
+
   void _removeFile(String id) {
     setState(() {
       _files.removeWhere((f) => f.id == id);
     });
     _notifyValue();
   }
+
   void _showError(String message) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: Colors.red),
     );
   }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -104,10 +113,16 @@ class _MultiFileUploadWidgetState extends State<MultiFileUploadWidget> {
                 Icon(Icons.folder_open, color: theme.colorScheme.primary),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: Text('Multiple Files', style: theme.textTheme.titleMedium),
+                  child: Text(
+                    'Multiple Files',
+                    style: theme.textTheme.titleMedium,
+                  ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: theme.colorScheme.primaryContainer,
                     borderRadius: BorderRadius.circular(12),
@@ -122,8 +137,7 @@ class _MultiFileUploadWidgetState extends State<MultiFileUploadWidget> {
               ],
             ),
             const SizedBox(height: 16),
-            if (_files.length < _maxFiles)
-              _buildAddButton(theme),
+            if (_files.length < _maxFiles) _buildAddButton(theme),
             if (_files.isNotEmpty) ...[
               const SizedBox(height: 16),
               ..._files.map((file) => _buildFileItem(file, theme)),
@@ -133,6 +147,7 @@ class _MultiFileUploadWidgetState extends State<MultiFileUploadWidget> {
       ),
     );
   }
+
   Widget _buildAddButton(ThemeData theme) {
     return InkWell(
       onTap: _pickFiles,
@@ -162,6 +177,7 @@ class _MultiFileUploadWidgetState extends State<MultiFileUploadWidget> {
       ),
     );
   }
+
   Widget _buildFileItem(MediaFile file, ThemeData theme) {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -213,7 +229,11 @@ class _MultiFileUploadWidgetState extends State<MultiFileUploadWidget> {
                 const Icon(Icons.check_circle, color: Colors.green, size: 20),
               const SizedBox(width: 8),
               IconButton(
-                icon: Icon(Icons.close, size: 18, color: theme.colorScheme.error),
+                icon: Icon(
+                  Icons.close,
+                  size: 18,
+                  color: theme.colorScheme.error,
+                ),
                 onPressed: () => _removeFile(file.id),
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
@@ -234,6 +254,7 @@ class _MultiFileUploadWidgetState extends State<MultiFileUploadWidget> {
       ),
     );
   }
+
   IconData _getFileIcon(String? extension) {
     switch (extension?.toLowerCase()) {
       case 'pdf':

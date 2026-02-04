@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import '../models.dart';
 import '../form_widgets.dart';
+
 class GroupedFieldsWidget extends StatefulWidget {
   final FieldModel field;
   final Map<String, dynamic> formData;
@@ -15,6 +16,7 @@ class GroupedFieldsWidget extends StatefulWidget {
   @override
   State<GroupedFieldsWidget> createState() => _GroupedFieldsWidgetState();
 }
+
 class _GroupedFieldsWidgetState extends State<GroupedFieldsWidget> {
   final List<GroupInstance> _groups = [];
   final Uuid _uuid = const Uuid();
@@ -25,6 +27,7 @@ class _GroupedFieldsWidgetState extends State<GroupedFieldsWidget> {
     super.initState();
     _initializeGroups();
   }
+
   void _initializeGroups() {
     final initialCount = _minRequired > 0 ? _minRequired : 1;
     for (int i = 0; i < initialCount; i++) {
@@ -36,6 +39,7 @@ class _GroupedFieldsWidgetState extends State<GroupedFieldsWidget> {
       }
     });
   }
+
   void _addGroup() {
     if (_groups.length < _maxLimit) {
       setState(() {
@@ -44,6 +48,7 @@ class _GroupedFieldsWidgetState extends State<GroupedFieldsWidget> {
       _notifyValueChanged();
     }
   }
+
   Future<void> _confirmAndRemoveGroup(int index) async {
     if (_groups.length <= _minRequired) return;
     final confirmed = await showDialog<bool>(
@@ -81,21 +86,27 @@ class _GroupedFieldsWidgetState extends State<GroupedFieldsWidget> {
       _notifyValueChanged();
     }
   }
+
   void _toggleExpansion(int index) {
     setState(() {
       _groups[index].isExpanded = !_groups[index].isExpanded;
     });
   }
+
   void _handleSubFieldChanged(int groupIndex, String fieldId, dynamic value) {
     setState(() {
       _groups[groupIndex].data[fieldId] = value;
     });
     _notifyValueChanged();
   }
+
   void _notifyValueChanged() {
-    final groupData = _groups.map((g) => Map<String, dynamic>.from(g.data)).toList();
+    final groupData = _groups
+        .map((g) => Map<String, dynamic>.from(g.data))
+        .toList();
     widget.onValueChanged(widget.field.fieldId, groupData);
   }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -118,7 +129,9 @@ class _GroupedFieldsWidgetState extends State<GroupedFieldsWidget> {
               backgroundColor: colorScheme.primaryContainer,
               foregroundColor: colorScheme.onPrimaryContainer,
               disabledBackgroundColor: colorScheme.surfaceContainerHighest,
-              disabledForegroundColor: colorScheme.onSurface.withValues(alpha: 0.38),
+              disabledForegroundColor: colorScheme.onSurface.withValues(
+                alpha: 0.38,
+              ),
             ),
           ),
         ),
@@ -137,6 +150,7 @@ class _GroupedFieldsWidgetState extends State<GroupedFieldsWidget> {
       ],
     );
   }
+
   Widget _buildGroupCard(BuildContext context, int index, GroupInstance group) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
@@ -153,10 +167,14 @@ class _GroupedFieldsWidgetState extends State<GroupedFieldsWidget> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                color: colorScheme.surfaceContainerHighest.withValues(
+                  alpha: 0.5,
+                ),
                 borderRadius: BorderRadius.vertical(
                   top: const Radius.circular(12),
-                  bottom: group.isExpanded ? Radius.zero : const Radius.circular(12),
+                  bottom: group.isExpanded
+                      ? Radius.zero
+                      : const Radius.circular(12),
                 ),
               ),
               child: Row(
@@ -176,12 +194,18 @@ class _GroupedFieldsWidgetState extends State<GroupedFieldsWidget> {
                     ),
                   ),
                   IconButton(
-                    onPressed: canRemove ? () => _confirmAndRemoveGroup(index) : null,
+                    onPressed: canRemove
+                        ? () => _confirmAndRemoveGroup(index)
+                        : null,
                     icon: Icon(
                       Icons.delete_outline,
-                      color: canRemove ? colorScheme.error : colorScheme.outline,
+                      color: canRemove
+                          ? colorScheme.error
+                          : colorScheme.outline,
                     ),
-                    tooltip: canRemove ? 'Remove section' : 'Minimum sections required',
+                    tooltip: canRemove
+                        ? 'Remove section'
+                        : 'Minimum sections required',
                     visualDensity: VisualDensity.compact,
                   ),
                 ],
@@ -200,6 +224,7 @@ class _GroupedFieldsWidgetState extends State<GroupedFieldsWidget> {
       ),
     );
   }
+
   Widget _buildSubFields(int groupIndex, GroupInstance group) {
     if (widget.field.subFields == null || widget.field.subFields!.isEmpty) {
       return Padding(
@@ -207,8 +232,8 @@ class _GroupedFieldsWidgetState extends State<GroupedFieldsWidget> {
         child: Text(
           'No subfields configured',
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.outline,
-              ),
+            color: Theme.of(context).colorScheme.outline,
+          ),
         ),
       );
     }

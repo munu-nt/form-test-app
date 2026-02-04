@@ -25,12 +25,13 @@ import 'widgets/econsent_widget.dart';
 import 'widgets/formula_widget.dart';
 import 'widgets/multi_web_url_widget.dart';
 import 'widgets/complex_field_widget.dart';
+
 class DynamicFormField extends StatefulWidget {
   final FieldModel field;
   final Function(String, dynamic) onValueChanged;
   final Map<String, dynamic> formData;
   final int displayIndex;
-  final List<FieldModel>? allFields;  
+  final List<FieldModel>? allFields;
   const DynamicFormField({
     super.key,
     required this.field,
@@ -42,6 +43,7 @@ class DynamicFormField extends StatefulWidget {
   @override
   State<DynamicFormField> createState() => _DynamicFormFieldState();
 }
+
 class _DynamicFormFieldState extends State<DynamicFormField> {
   late TextEditingController _textController;
   String? _dropdownValue;
@@ -56,33 +58,37 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
           .map((e) => e.value)
           .toSet();
       if (!validValues.contains(_dropdownValue)) {
-        _dropdownValue = null; 
+        _dropdownValue = null;
       }
     }
   }
+
   @override
   void didUpdateWidget(covariant DynamicFormField oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.formData != oldWidget.formData) {
-       _checkDependencyValidity();
+      _checkDependencyValidity();
     }
   }
+
   void _checkDependencyValidity() {
-      if (widget.field.fieldOptions == null) return;
-      List<FieldOptionModel> currentOptions = _getFilteredOptions();
-       if (_dropdownValue != null && !currentOptions.any((op) => op.value == _dropdownValue)) {
-         setState(() {
-            _dropdownValue = null;
-         });
-       }
+    if (widget.field.fieldOptions == null) return;
+    List<FieldOptionModel> currentOptions = _getFilteredOptions();
+    if (_dropdownValue != null &&
+        !currentOptions.any((op) => op.value == _dropdownValue)) {
+      setState(() {
+        _dropdownValue = null;
+      });
+    }
   }
+
   List<FieldOptionModel> _getFilteredOptions() {
     if (widget.field.fieldOptions == null) return [];
     String? parentFieldId = _findParentFieldId();
     if (parentFieldId != null) {
       String? parentValue = widget.formData[parentFieldId];
       if (parentValue == null || parentValue.isEmpty) {
-        return [];  
+        return [];
       }
       return widget.field.fieldOptions!
           .where((op) => op.parentCode == parentValue)
@@ -90,13 +96,14 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
     }
     return widget.field.fieldOptions!;
   }
+
   String? _findParentFieldId() {
     if (!widget.field.isDependent) return null;
     if (widget.allFields == null) return null;
     final fieldType = widget.field.fieldType;
     const Map<String, String> dependencyHierarchy = {
       'StateList': 'CountryList',
-      'CountyList': 'StateList', 
+      'CountyList': 'StateList',
       'CityList': 'CountyList',
       'ProgramList': 'DepartmentList',
     };
@@ -116,33 +123,39 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
     }
     return null;
   }
+
   @override
   void dispose() {
     _textController.dispose();
     super.dispose();
   }
+
   String? _validateField(String? value) {
     if (widget.field.isMandate) {
       if (value == null || value.trim().isEmpty) {
         return '${widget.field.fieldName} is required';
       }
     }
-    if ((widget.field.fieldType == 'Email' || widget.field.fieldType == 'EmailID') && value != null && value.isNotEmpty) {
-       final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-       if (!emailRegex.hasMatch(value)) {
-         return 'Invalid email address';
-       }
+    if ((widget.field.fieldType == 'Email' ||
+            widget.field.fieldType == 'EmailID') &&
+        value != null &&
+        value.isNotEmpty) {
+      final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+      if (!emailRegex.hasMatch(value)) {
+        return 'Invalid email address';
+      }
     }
     if (widget.field.fieldType == 'PostalCode') {
-        String? countryValue = widget.formData['2005'];
-        if (countryValue == 'US' && value != null && value.isNotEmpty) {
-             if (!RegExp(r'^\d{5}(?:[-\s]\d{4})?$').hasMatch(value)) {
-                 return 'Invalid US Postal Code';
-             }
+      String? countryValue = widget.formData['2005'];
+      if (countryValue == 'US' && value != null && value.isNotEmpty) {
+        if (!RegExp(r'^\d{5}(?:[-\s]\d{4})?$').hasMatch(value)) {
+          return 'Invalid US Postal Code';
         }
+      }
     }
     return null;
   }
+
   @override
   Widget build(BuildContext context) {
     if (widget.field.hideField) return const SizedBox.shrink();
@@ -151,18 +164,22 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (widget.field.fieldType != 'Label' && widget.field.fieldType != 'Divider' && widget.field.fieldType != 'HtmlViewer') _buildLabel(),
+          if (widget.field.fieldType != 'Label' &&
+              widget.field.fieldType != 'Divider' &&
+              widget.field.fieldType != 'HtmlViewer')
+            _buildLabel(),
           const SizedBox(height: 8),
           _buildInput(),
         ],
       ),
     );
   }
+
   Widget _buildLabel() {
     final displayIdx = widget.displayIndex;
     return Row(
       children: [
-      /*
+        /*
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
           margin: const EdgeInsets.only(right: 8),
@@ -184,15 +201,17 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
             text: TextSpan(
               text: widget.field.fieldName,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
               children: widget.field.isMandate
                   ? [
                       TextSpan(
                         text: ' *',
-                        style: TextStyle(color: Theme.of(context).colorScheme.error),
-                      )
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                      ),
                     ]
                   : [],
             ),
@@ -216,6 +235,7 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
       ],
     );
   }
+
   Widget _buildInput() {
     if (widget.field.fieldType == 'GroupedFields') {
       return GroupedFieldsWidget(
@@ -225,67 +245,84 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
         onValueChanged: widget.onValueChanged,
       );
     }
-    if (widget.field.fieldOptions != null && widget.field.fieldOptions!.isNotEmpty) {
-        if (widget.field.fieldType == 'ProgramProfile') {
-            return CardSelector(
-                key: Key(widget.field.fieldId),
-                field: widget.field,
-                onValueChanged: widget.onValueChanged,
-                formData: widget.formData,
-            );
-        }
-        if (widget.field.fieldType == 'CheckBox') {
-           return CheckBoxWidget(
-             key: Key(widget.field.fieldId),
-             field: widget.field,
-             onValueChanged: widget.onValueChanged,
-             formData: widget.formData,
-           );
-        }
+    if (widget.field.fieldOptions != null &&
+        widget.field.fieldOptions!.isNotEmpty) {
+      if (widget.field.fieldType == 'ProgramProfile') {
+        return CardSelector(
+          key: Key(widget.field.fieldId),
+          field: widget.field,
+          onValueChanged: widget.onValueChanged,
+          formData: widget.formData,
+        );
+      }
+      if (widget.field.fieldType == 'CheckBox') {
+        return CheckBoxWidget(
+          key: Key(widget.field.fieldId),
+          field: widget.field,
+          onValueChanged: widget.onValueChanged,
+          formData: widget.formData,
+        );
+      }
       if (widget.field.fieldType == 'RadioButton') {
         return _buildRadioButton();
       }
-      if (['AcademicSchool', 'CitizenshipList', 'AcademicLevel', 'DepartmentList', 'ProgramList', 'CityList', 'CountyList', 'CountryList', 'StateList',
-           'WorkshopList', 'AdmitTermList', 'CampusList', 'ExhibitorList', 'PartnerList', 'Semester', 'Forum', 'DropDown'
-          ].contains(widget.field.fieldType)) {
-          List<FieldOptionModel> filteredOptions = _getFilteredOptions();
-          FieldModel filteredField = FieldModel(
-              fieldId: widget.field.fieldId,
-              fieldName: widget.field.fieldName,
-              fieldType: widget.field.fieldType,
-              fieldValue: _dropdownValue,
-              isMandate: widget.field.isMandate,
-              isReadOnly: widget.field.isReadOnly,
-              hideField: widget.field.hideField,
-              fieldOptions: filteredOptions,  
-              fieldMaxLength: widget.field.fieldMaxLength,
-              sequence: widget.field.sequence,
-              index: widget.field.index,
-          );
-          return SearchableDropdown(
-            key: Key(widget.field.fieldId),
-            field: filteredField,
-            initialValue: _dropdownValue,
-            onValueChanged: (val) {
-               setState(() => _dropdownValue = val);
-               widget.onValueChanged(widget.field.fieldId, val);
-            },
-          );
-       }
+      if ([
+        'AcademicSchool',
+        'CitizenshipList',
+        'AcademicLevel',
+        'DepartmentList',
+        'ProgramList',
+        'CityList',
+        'CountyList',
+        'CountryList',
+        'StateList',
+        'WorkshopList',
+        'AdmitTermList',
+        'CampusList',
+        'ExhibitorList',
+        'PartnerList',
+        'Semester',
+        'Forum',
+        'DropDown',
+      ].contains(widget.field.fieldType)) {
+        List<FieldOptionModel> filteredOptions = _getFilteredOptions();
+        FieldModel filteredField = FieldModel(
+          fieldId: widget.field.fieldId,
+          fieldName: widget.field.fieldName,
+          fieldType: widget.field.fieldType,
+          fieldValue: _dropdownValue,
+          isMandate: widget.field.isMandate,
+          isReadOnly: widget.field.isReadOnly,
+          hideField: widget.field.hideField,
+          fieldOptions: filteredOptions,
+          fieldMaxLength: widget.field.fieldMaxLength,
+          sequence: widget.field.sequence,
+          index: widget.field.index,
+        );
+        return SearchableDropdown(
+          key: Key(widget.field.fieldId),
+          field: filteredField,
+          initialValue: _dropdownValue,
+          onValueChanged: (val) {
+            setState(() => _dropdownValue = val);
+            widget.onValueChanged(widget.field.fieldId, val);
+          },
+        );
+      }
       return _buildDropdown();
     }
     switch (widget.field.fieldType) {
       case 'Rating':
-         return StarRating(
-             key: Key(widget.field.fieldId),
-             field: widget.field, 
-             onValueChanged: widget.onValueChanged,
-             formData: widget.formData,
-         );
+        return StarRating(
+          key: Key(widget.field.fieldId),
+          field: widget.field,
+          onValueChanged: widget.onValueChanged,
+          formData: widget.formData,
+        );
       case 'Divider':
         return _buildDivider();
       case 'Label':
-         return _buildStaticLabel();
+        return _buildStaticLabel();
       case 'LikeUnlike':
         return _buildLikeUnlike();
       case 'FileUpload':
@@ -357,13 +394,13 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
       case 'ProgramContactProfile':
       case 'PhoneBook':
       case 'ProgramProfile':
-         return ComplexFieldWidget(
-            key: Key(widget.field.fieldId),
-            parentField: widget.field,
-            allFields: widget.allFields ?? [],
-            formData: widget.formData,
-            onValueChanged: widget.onValueChanged,
-         );
+        return ComplexFieldWidget(
+          key: Key(widget.field.fieldId),
+          parentField: widget.field,
+          allFields: widget.allFields ?? [],
+          formData: widget.formData,
+          onValueChanged: widget.onValueChanged,
+        );
       case 'SequenceNumber':
         return SequenceNumberWidget(
           key: Key(widget.field.fieldId),
@@ -389,74 +426,88 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
           onValueChanged: widget.onValueChanged,
         );
       case 'CheckBox':
-         return CheckBoxWidget(
-           key: Key(widget.field.fieldId),
-           field: widget.field,
-           onValueChanged: widget.onValueChanged,
-           formData: widget.formData,
-         );
+        return CheckBoxWidget(
+          key: Key(widget.field.fieldId),
+          field: widget.field,
+          onValueChanged: widget.onValueChanged,
+          formData: widget.formData,
+        );
       case 'WebView':
       case 'web_view':
-         return StaticWebWidget(
-           key: Key(widget.field.fieldId),
-           field: widget.field,
-         );
+        return StaticWebWidget(
+          key: Key(widget.field.fieldId),
+          field: widget.field,
+        );
       case 'HtmlViewer':
         return _buildHtmlViewer();
       case 'TextArea':
-         return _buildTextField(isTextArea: true);
+        return _buildTextField(isTextArea: true);
       case 'InputBox':
       case 'TextBox':
-         return _buildTextField(key: Key(widget.field.fieldId));
+        return _buildTextField(key: Key(widget.field.fieldId));
       case 'Email':
       case 'EmailID':
-         return _buildTextField(inputType: TextInputType.emailAddress, key: Key(widget.field.fieldId));
+        return _buildTextField(
+          inputType: TextInputType.emailAddress,
+          key: Key(widget.field.fieldId),
+        );
       case 'PhoneBook':
-         return _buildTextField(inputType: TextInputType.phone, key: Key(widget.field.fieldId));
+        return _buildTextField(
+          inputType: TextInputType.phone,
+          key: Key(widget.field.fieldId),
+        );
       case 'WebUrl':
-         return _buildTextField(inputType: TextInputType.url, key: Key(widget.field.fieldId));
+        return _buildTextField(
+          inputType: TextInputType.url,
+          key: Key(widget.field.fieldId),
+        );
       case 'PostalCode':
-         return _buildTextField(inputType: TextInputType.number, key: Key(widget.field.fieldId));
+        return _buildTextField(
+          inputType: TextInputType.number,
+          key: Key(widget.field.fieldId),
+        );
       case 'Time':
-         return _buildTimePicker();
+        return _buildTimePicker();
       case 'ArrivalDate':
       case 'Calendar':
       case 'DateTime':
-         return DatePickerWidget(
-           key: Key(widget.field.fieldId),
-           field: widget.field,
-           onValueChanged: widget.onValueChanged,
-           formData: widget.formData,
-         );
+        return DatePickerWidget(
+          key: Key(widget.field.fieldId),
+          field: widget.field,
+          onValueChanged: widget.onValueChanged,
+          formData: widget.formData,
+        );
       case 'AddressBook':
-         return AddressBookWidget(
-           field: widget.field,
-           onValueChanged: widget.onValueChanged,
-         );
+        return AddressBookWidget(
+          field: widget.field,
+          onValueChanged: widget.onValueChanged,
+        );
       case 'AppointmentCalendar':
-         return AppointmentWidget(
-            field: widget.field,
-            onValueChanged: widget.onValueChanged,
-         );
+        return AppointmentWidget(
+          field: widget.field,
+          onValueChanged: widget.onValueChanged,
+        );
       case 'GroupedFields':
-         return GroupedFieldsWidget(
-            key: Key(widget.field.fieldId),
-            field: widget.field,
-            formData: widget.formData,
-            onValueChanged: widget.onValueChanged,
-         );
+        return GroupedFieldsWidget(
+          key: Key(widget.field.fieldId),
+          field: widget.field,
+          formData: widget.formData,
+          onValueChanged: widget.onValueChanged,
+        );
       default:
         return _buildTextField();
     }
   }
+
   Widget _buildStaticLabel() {
     return Text(
       widget.field.fieldName,
-      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-         fontWeight: FontWeight.w500,
-      ),
+      style: Theme.of(
+        context,
+      ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
     );
   }
+
   Widget _buildHtmlViewer() {
     String htmlContent = widget.field.fieldName;
     return Padding(
@@ -467,9 +518,11 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
       ),
     );
   }
+
   Widget _buildDivider() {
     return const Divider(thickness: 1.5);
   }
+
   Widget _buildLikeUnlike() {
     bool? isLiked;
     if (_textController.text == 'Like') isLiked = true;
@@ -479,7 +532,9 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
         IconButton(
           icon: Icon(
             Icons.thumb_up,
-            color: isLiked == true ? Theme.of(context).primaryColor : Colors.grey,
+            color: isLiked == true
+                ? Theme.of(context).primaryColor
+                : Colors.grey,
           ),
           onPressed: widget.field.isReadOnly
               ? null
@@ -494,7 +549,9 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
         IconButton(
           icon: Icon(
             Icons.thumb_down,
-            color: isLiked == false ? Theme.of(context).primaryColor : Colors.grey,
+            color: isLiked == false
+                ? Theme.of(context).primaryColor
+                : Colors.grey,
           ),
           onPressed: widget.field.isReadOnly
               ? null
@@ -508,13 +565,14 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
       ],
     );
   }
+
   Widget _buildRadioButton() {
     return Column(
       children: widget.field.fieldOptions!.map((option) {
         return RadioListTile<String>(
           title: Text(option.text),
           value: option.value,
-          groupValue: _dropdownValue,  
+          groupValue: _dropdownValue,
           onChanged: widget.field.isReadOnly
               ? null
               : (value) {
@@ -522,19 +580,22 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
                     setState(() {
                       _dropdownValue = value;
                     });
-                     widget.onValueChanged(widget.field.fieldId, value);
+                    widget.onValueChanged(widget.field.fieldId, value);
                   }
                 },
         );
       }).toList(),
     );
   }
+
   Widget _buildDropdown() {
     return DropdownButtonFormField<String>(
       decoration: InputDecoration(
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         filled: true,
-        fillColor: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+        fillColor: Theme.of(
+          context,
+        ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
       ),
       initialValue: _dropdownValue,
       isExpanded: true,
@@ -558,8 +619,9 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
             },
     );
   }
+
   Widget _buildTimePicker() {
-     return GestureDetector(
+    return GestureDetector(
       onTap: widget.field.isReadOnly
           ? null
           : () async {
@@ -583,14 +645,21 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
           decoration: InputDecoration(
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             filled: true,
-            fillColor: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+            fillColor: Theme.of(
+              context,
+            ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
             suffixIcon: const Icon(Icons.access_time),
           ),
         ),
       ),
     );
   }
-  Widget _buildTextField({bool isTextArea = false, TextInputType? inputType, Key? key}) {
+
+  Widget _buildTextField({
+    bool isTextArea = false,
+    TextInputType? inputType,
+    Key? key,
+  }) {
     return TextFormField(
       key: key,
       controller: _textController,
@@ -601,7 +670,9 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
       decoration: InputDecoration(
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         filled: true,
-        fillColor: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+        fillColor: Theme.of(
+          context,
+        ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
       ),
       onChanged: (value) {
         widget.onValueChanged(widget.field.fieldId, value);

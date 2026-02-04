@@ -1,12 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'models.dart';
 import 'form_widgets.dart';
 import 'database_helper.dart';
+
 void main() {
   runApp(const MyApp());
 }
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override
@@ -41,11 +42,13 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
 class FormPage extends StatefulWidget {
   const FormPage({super.key});
   @override
   State<FormPage> createState() => _FormPageState();
 }
+
 class _FormPageState extends State<FormPage> {
   FormModel? _formModel;
   bool _isLoading = true;
@@ -61,10 +64,12 @@ class _FormPageState extends State<FormPage> {
       _isDataLoaded = true;
     }
   }
+
   Future<void> _loadFormData() async {
     try {
-      final String response =
-          await DefaultAssetBundle.of(context).loadString('data/form-data.json');
+      final String response = await DefaultAssetBundle.of(
+        context,
+      ).loadString('data/form-data.json');
       final data = json.decode(response);
       setState(() {
         _formModel = FormModel.fromJson(data);
@@ -74,7 +79,7 @@ class _FormPageState extends State<FormPage> {
           name = name.replaceAll(RegExp(r'\s*\[.*?\]\s*'), '');
           name = name.trim();
           if (name.isEmpty) name = 'Dynamic Form';
-           _formModel = FormModel(
+          _formModel = FormModel(
             status: _formModel!.status,
             errorType: _formModel!.errorType,
             formName: name,
@@ -106,11 +111,13 @@ class _FormPageState extends State<FormPage> {
       });
     }
   }
+
   void _handleValueChanged(String fieldId, dynamic value) {
     setState(() {
       _formData[fieldId] = value;
     });
   }
+
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
       await DatabaseHelper.saveFormData(_formData);
@@ -138,13 +145,13 @@ class _FormPageState extends State<FormPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Tooltip(
+                const Tooltip(
                   message: 'Data will persist when app reopens',
                   child: Row(
                     children: [
                       Icon(Icons.info_outline, size: 16, color: Colors.grey),
-                      const SizedBox(width: 4),
-                      const Text('Form saved successfully!'),
+                      SizedBox(width: 4),
+                      Text('Form saved successfully!'),
                     ],
                   ),
                 ),
@@ -167,13 +174,16 @@ class _FormPageState extends State<FormPage> {
       );
     }
   }
+
   Future<void> _clearDatabase() async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        icon: Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 48),
+        icon: const Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 48),
         title: const Text('Clear All Saved Data?'),
-        content: const Text('This will delete all saved form data from the database. This action cannot be undone.'),
+        content: const Text(
+          'This will delete all saved form data from the database. This action cannot be undone.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -202,6 +212,7 @@ class _FormPageState extends State<FormPage> {
       );
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -219,8 +230,8 @@ class _FormPageState extends State<FormPage> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _errorMessage != null
-              ? Center(child: Text(_errorMessage!))
-              : _buildForm(),
+          ? Center(child: Text(_errorMessage!))
+          : _buildForm(),
       bottomNavigationBar: _formModel != null
           ? Padding(
               padding: const EdgeInsets.all(16.0),
@@ -235,16 +246,17 @@ class _FormPageState extends State<FormPage> {
           : null,
     );
   }
+
   Widget _buildForm() {
     if (_formModel == null) return const SizedBox.shrink();
     final fields = _formModel!.fields;
     final complexTypes = {
-      'AddressBook', 
-      'EmergencyContact', 
-      'PhoneBook', 
-      'ProgramContactProfile', 
-      'ProgramProfile', 
-      'UserProfile'
+      'AddressBook',
+      'EmergencyContact',
+      'PhoneBook',
+      'ProgramContactProfile',
+      'ProgramProfile',
+      'UserProfile',
     };
     final complexIds = fields
         .where((f) => complexTypes.contains(f.fieldType))
@@ -255,13 +267,13 @@ class _FormPageState extends State<FormPage> {
     final filteredFields = fields.where((f) {
       if (complexIds.contains(f.fieldId)) {
         if (!complexTypes.contains(f.fieldType)) {
-           return false;
+          return false;
         }
         return true;
       }
       if (f.isGroupedField) {
-         if (f.fieldType == 'GroupedFields') return true;
-         return false;
+        if (f.fieldType == 'GroupedFields') return true;
+        return false;
       }
       return true;
     }).toList();
@@ -277,7 +289,7 @@ class _FormPageState extends State<FormPage> {
             onValueChanged: _handleValueChanged,
             formData: _formData,
             displayIndex: index,
-            allFields: fields, 
+            allFields: fields,
           );
         },
       ),

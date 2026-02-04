@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models.dart';
+
 class DatePickerWidget extends StatefulWidget {
   final FieldModel field;
   final Function(String, dynamic) onValueChanged;
@@ -14,6 +15,7 @@ class DatePickerWidget extends StatefulWidget {
   @override
   State<DatePickerWidget> createState() => _DatePickerWidgetState();
 }
+
 class _DatePickerWidgetState extends State<DatePickerWidget> {
   late TextEditingController _controller;
   DateTime? _selectedDate;
@@ -27,6 +29,7 @@ class _DatePickerWidgetState extends State<DatePickerWidget> {
     _controller = TextEditingController(text: savedValue);
     _parseInitialValue(savedValue);
   }
+
   void _parseInitialValue(String? value) {
     if (value != null && value.isNotEmpty) {
       try {
@@ -41,6 +44,7 @@ class _DatePickerWidgetState extends State<DatePickerWidget> {
       }
     }
   }
+
   bool get _isDateTimeField => widget.field.fieldType == 'DateTime';
   DateTime get _firstDate {
     final config = widget.field.calendarConfig;
@@ -53,6 +57,7 @@ class _DatePickerWidgetState extends State<DatePickerWidget> {
     }
     return DateTime(2000);
   }
+
   DateTime get _lastDate {
     final config = widget.field.calendarConfig;
     if (config?.maxDate != null && config!.maxDate!.isNotEmpty) {
@@ -64,6 +69,7 @@ class _DatePickerWidgetState extends State<DatePickerWidget> {
     }
     return DateTime(2101);
   }
+
   bool _selectableDayPredicate(DateTime day) {
     final config = widget.field.calendarConfig;
     if (config == null) return true;
@@ -79,7 +85,8 @@ class _DatePickerWidgetState extends State<DatePickerWidget> {
         return false;
       }
     }
-    if (restricted.daysOfMonths != null && restricted.daysOfMonths!.isNotEmpty) {
+    if (restricted.daysOfMonths != null &&
+        restricted.daysOfMonths!.isNotEmpty) {
       if (restricted.daysOfMonths!.contains(day.day)) {
         return false;
       }
@@ -98,6 +105,7 @@ class _DatePickerWidgetState extends State<DatePickerWidget> {
     }
     return true;
   }
+
   Future<void> _selectDate() async {
     if (widget.field.isReadOnly) return;
     final DateTime initialDate = _selectedDate ?? DateTime.now();
@@ -127,6 +135,7 @@ class _DatePickerWidgetState extends State<DatePickerWidget> {
       }
     }
   }
+
   Future<void> _selectTime() async {
     if (widget.field.isReadOnly) return;
     final TimeOfDay initialTime = _selectedTime ?? TimeOfDay.now();
@@ -146,6 +155,7 @@ class _DatePickerWidgetState extends State<DatePickerWidget> {
     }
     _updateValue();
   }
+
   void _updateValue() {
     if (_selectedDate == null) return;
     String formattedValue;
@@ -157,7 +167,7 @@ class _DatePickerWidgetState extends State<DatePickerWidget> {
         _selectedDate!.day,
         time.hour,
         time.minute,
-        0,  
+        0,
       );
       formattedValue = DateFormat(_dateTimeFormat).format(dateTime);
     } else {
@@ -168,6 +178,7 @@ class _DatePickerWidgetState extends State<DatePickerWidget> {
     });
     widget.onValueChanged(widget.field.fieldId, formattedValue);
   }
+
   String? _validate(String? value) {
     if (widget.field.isMandate) {
       if (value == null || value.trim().isEmpty) {
@@ -176,11 +187,13 @@ class _DatePickerWidgetState extends State<DatePickerWidget> {
     }
     return null;
   }
+
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -193,16 +206,13 @@ class _DatePickerWidgetState extends State<DatePickerWidget> {
           decoration: InputDecoration(
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             filled: true,
-            fillColor: Theme.of(context)
-                .colorScheme
-                .surfaceContainerHighest
-                .withValues(alpha: 0.3),
+            fillColor: Theme.of(
+              context,
+            ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
             suffixIcon: Icon(
               _isDateTimeField ? Icons.access_time : Icons.calendar_today,
             ),
-            hintText: _isDateTimeField
-                ? 'Select date and time'
-                : 'Select date',
+            hintText: _isDateTimeField ? 'Select date and time' : 'Select date',
           ),
         ),
       ),

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../models.dart';
+
 class SequenceNumberWidget extends StatefulWidget {
   final FieldModel field;
   final Function(String, dynamic) onValueChanged;
@@ -12,6 +13,7 @@ class SequenceNumberWidget extends StatefulWidget {
   @override
   State<SequenceNumberWidget> createState() => _SequenceNumberWidgetState();
 }
+
 class _SequenceNumberWidgetState extends State<SequenceNumberWidget> {
   late String _sequenceValue;
   SequenceNumberConfig? _config;
@@ -21,8 +23,10 @@ class _SequenceNumberWidgetState extends State<SequenceNumberWidget> {
     _parseConfig();
     _generateSequence();
   }
+
   void _parseConfig() {
-    if (widget.field.fieldValue != null && widget.field.fieldValue!.isNotEmpty) {
+    if (widget.field.fieldValue != null &&
+        widget.field.fieldValue!.isNotEmpty) {
       try {
         final configJson = json.decode(widget.field.fieldValue!);
         _config = SequenceNumberConfig.fromJson(configJson);
@@ -38,12 +42,14 @@ class _SequenceNumberWidgetState extends State<SequenceNumberWidget> {
       );
     }
   }
+
   void _generateSequence() {
     _sequenceValue = _config?.generateSequence() ?? 'SEQ-0001';
     WidgetsBinding.instance.addPostFrameCallback((_) {
       widget.onValueChanged(widget.field.fieldId, _sequenceValue);
     });
   }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -64,11 +70,7 @@ class _SequenceNumberWidgetState extends State<SequenceNumberWidget> {
             if (!hideFieldName) ...[
               Row(
                 children: [
-                  Icon(
-                    Icons.tag,
-                    color: theme.colorScheme.primary,
-                    size: 20,
-                  ),
+                  Icon(Icons.tag, color: theme.colorScheme.primary, size: 20),
                   const SizedBox(width: 8),
                   Text(
                     'Sequence Number',
@@ -84,7 +86,9 @@ class _SequenceNumberWidgetState extends State<SequenceNumberWidget> {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                color: theme.colorScheme.surfaceContainerHighest.withValues(
+                  alpha: 0.5,
+                ),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: theme.colorScheme.outline.withValues(alpha: 0.3),
@@ -93,7 +97,10 @@ class _SequenceNumberWidgetState extends State<SequenceNumberWidget> {
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: theme.colorScheme.primary.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(6),

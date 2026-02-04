@@ -2,15 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import '../models.dart';
+
 class StaticWebWidget extends StatefulWidget {
   final FieldModel field;
-  const StaticWebWidget({
-    super.key,
-    required this.field,
-  });
+  const StaticWebWidget({super.key, required this.field});
   @override
   State<StaticWebWidget> createState() => _StaticWebWidgetState();
 }
+
 class _StaticWebWidgetState extends State<StaticWebWidget> {
   WebViewController? _controller;
   bool _isLoading = true;
@@ -20,22 +19,29 @@ class _StaticWebWidgetState extends State<StaticWebWidget> {
     super.initState();
     _initWebView();
   }
+
   void _initWebView() {
     final content = widget.field.fieldValue ?? '';
     if (content.isEmpty || !_isUrl(content)) return;
     try {
       _controller = WebViewController()
         ..setJavaScriptMode(JavaScriptMode.disabled)
-        ..setNavigationDelegate(NavigationDelegate(
-          onPageStarted: (_) => setState(() => _isLoading = true),
-          onPageFinished: (_) => setState(() => _isLoading = false),
-          onWebResourceError: (_) => setState(() { _hasError = true; _isLoading = false; }),
-        ))
+        ..setNavigationDelegate(
+          NavigationDelegate(
+            onPageStarted: (_) => setState(() => _isLoading = true),
+            onPageFinished: (_) => setState(() => _isLoading = false),
+            onWebResourceError: (_) => setState(() {
+              _hasError = true;
+              _isLoading = false;
+            }),
+          ),
+        )
         ..loadRequest(Uri.parse(content));
     } catch (_) {
       _hasError = true;
     }
   }
+
   bool _isUrl(String s) => s.startsWith('http://') || s.startsWith('https://');
   bool _isHtml(String s) => s.contains('<') && s.contains('>');
   @override
@@ -49,6 +55,7 @@ class _StaticWebWidgetState extends State<StaticWebWidget> {
     }
     return _buildHtmlContent(content);
   }
+
   Widget _buildWebView(String url) {
     return Container(
       height: 250,
@@ -67,7 +74,11 @@ class _StaticWebWidgetState extends State<StaticWebWidget> {
               ),
               child: Row(
                 children: [
-                  Icon(Icons.language, size: 14, color: Theme.of(context).colorScheme.primary),
+                  Icon(
+                    Icons.language,
+                    size: 14,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
@@ -82,7 +93,11 @@ class _StaticWebWidgetState extends State<StaticWebWidget> {
                     onTap: () => _openFullScreen(url),
                     child: Padding(
                       padding: const EdgeInsets.all(4),
-                      child: Icon(Icons.open_in_new, size: 16, color: Theme.of(context).colorScheme.primary),
+                      child: Icon(
+                        Icons.open_in_new,
+                        size: 16,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
                     ),
                   ),
                 ],
@@ -96,17 +111,22 @@ class _StaticWebWidgetState extends State<StaticWebWidget> {
                         if (_isLoading)
                           Container(
                             color: Theme.of(context).colorScheme.surface,
-                            child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                            child: const Center(
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
                           ),
                       ],
                     )
-                  : _buildCompactPlaceholder(_hasError ? 'Failed to load' : 'Open to view'),
+                  : _buildCompactPlaceholder(
+                      _hasError ? 'Failed to load' : 'Open to view',
+                    ),
             ),
           ],
         ),
       ),
     );
   }
+
   Widget _buildHtmlContent(String html) {
     return Container(
       padding: const EdgeInsets.all(12),
@@ -120,7 +140,11 @@ class _StaticWebWidgetState extends State<StaticWebWidget> {
         children: [
           Row(
             children: [
-              Icon(Icons.code, size: 14, color: Theme.of(context).colorScheme.secondary),
+              Icon(
+                Icons.code,
+                size: 14,
+                color: Theme.of(context).colorScheme.secondary,
+              ),
               const SizedBox(width: 6),
               Text(
                 'HTML Content',
@@ -131,47 +155,64 @@ class _StaticWebWidgetState extends State<StaticWebWidget> {
             ],
           ),
           const SizedBox(height: 8),
-          HtmlWidget(
-            html,
-            textStyle: Theme.of(context).textTheme.bodyMedium,
-          ),
+          HtmlWidget(html, textStyle: Theme.of(context).textTheme.bodyMedium),
         ],
       ),
     );
   }
+
   Widget _buildCompactPlaceholder(String message) {
     return Container(
       height: 80,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+        color: Theme.of(
+          context,
+        ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
       ),
       child: Center(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.web, size: 20, color: Theme.of(context).colorScheme.outline),
+            Icon(
+              Icons.web,
+              size: 20,
+              color: Theme.of(context).colorScheme.outline,
+            ),
             const SizedBox(width: 8),
-            Text(message, style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.outline)),
+            Text(
+              message,
+              style: TextStyle(
+                fontSize: 12,
+                color: Theme.of(context).colorScheme.outline,
+              ),
+            ),
           ],
         ),
       ),
     );
   }
+
   String _shortenUrl(String url) {
     try {
       final uri = Uri.parse(url);
-      return uri.host + (uri.path.isNotEmpty && uri.path != '/' ? uri.path : '');
+      return uri.host +
+          (uri.path.isNotEmpty && uri.path != '/' ? uri.path : '');
     } catch (_) {
       return url;
     }
   }
+
   void _openFullScreen(String url) {
-    Navigator.of(context).push(MaterialPageRoute(
-      builder: (_) => _FullScreenWebView(url: url, title: widget.field.fieldName),
-    ));
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) =>
+            _FullScreenWebView(url: url, title: widget.field.fieldName),
+      ),
+    );
   }
 }
+
 class _FullScreenWebView extends StatefulWidget {
   final String url;
   final String title;
@@ -179,6 +220,7 @@ class _FullScreenWebView extends StatefulWidget {
   @override
   State<_FullScreenWebView> createState() => _FullScreenWebViewState();
 }
+
 class _FullScreenWebViewState extends State<_FullScreenWebView> {
   late WebViewController _controller;
   bool _isLoading = true;
@@ -187,19 +229,25 @@ class _FullScreenWebViewState extends State<_FullScreenWebView> {
     super.initState();
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setNavigationDelegate(NavigationDelegate(
-        onPageStarted: (_) => setState(() => _isLoading = true),
-        onPageFinished: (_) => setState(() => _isLoading = false),
-      ))
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onPageStarted: (_) => setState(() => _isLoading = true),
+          onPageFinished: (_) => setState(() => _isLoading = false),
+        ),
+      )
       ..loadRequest(Uri.parse(widget.url));
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title, style: const TextStyle(fontSize: 14)),
         actions: [
-          IconButton(icon: const Icon(Icons.refresh), onPressed: () => _controller.reload()),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () => _controller.reload(),
+          ),
         ],
       ),
       body: Stack(

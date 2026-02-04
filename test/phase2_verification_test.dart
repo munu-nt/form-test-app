@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/services.dart';
 import 'package:test_1/main.dart';
-import 'package:test_1/widgets/searchable_dropdown.dart';
-import 'package:test_1/widgets/card_selector.dart';
-import 'package:test_1/widgets/star_rating.dart';
 
 // Mock dependencies as we can't load assets in widget tests easily without setup
 // Actually, better to test the FormPage if possible, but asset loading might fail

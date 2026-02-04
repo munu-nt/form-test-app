@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models.dart';
+
 class StarRating extends StatefulWidget {
   final FieldModel field;
   final Function(String, dynamic) onValueChanged;
@@ -13,6 +14,7 @@ class StarRating extends StatefulWidget {
   @override
   State<StarRating> createState() => _StarRatingState();
 }
+
 class _StarRatingState extends State<StarRating> {
   int _rating = 0;
   @override
@@ -21,6 +23,7 @@ class _StarRatingState extends State<StarRating> {
     final savedValue = widget.formData?[widget.field.fieldId];
     _rating = int.tryParse(savedValue?.toString() ?? '0') ?? 0;
   }
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -33,7 +36,10 @@ class _StarRatingState extends State<StarRating> {
                   setState(() {
                     _rating = index + 1;
                   });
-                  widget.onValueChanged(widget.field.fieldId, _rating.toString());
+                  widget.onValueChanged(
+                    widget.field.fieldId,
+                    _rating.toString(),
+                  );
                 },
           icon: Icon(
             index < _rating ? Icons.star : Icons.star_border,

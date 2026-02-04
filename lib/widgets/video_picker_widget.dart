@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:video_player/video_player.dart';
 import '../models.dart';
+
 class VideoPickerWidget extends StatefulWidget {
   final FieldModel field;
   final Function(String, dynamic) onValueChanged;
@@ -14,6 +15,7 @@ class VideoPickerWidget extends StatefulWidget {
   @override
   State<VideoPickerWidget> createState() => _VideoPickerWidgetState();
 }
+
 class _VideoPickerWidgetState extends State<VideoPickerWidget> {
   XFile? _selectedVideo;
   VideoPlayerController? _videoController;
@@ -26,6 +28,7 @@ class _VideoPickerWidgetState extends State<VideoPickerWidget> {
     _videoController?.dispose();
     super.dispose();
   }
+
   Future<void> _pickVideo(ImageSource source) async {
     setState(() {
       _isLoading = true;
@@ -63,6 +66,7 @@ class _VideoPickerWidgetState extends State<VideoPickerWidget> {
       });
     }
   }
+
   void _notifyValue() {
     if (_selectedVideo != null) {
       widget.onValueChanged(widget.field.fieldId, {
@@ -73,6 +77,7 @@ class _VideoPickerWidgetState extends State<VideoPickerWidget> {
       });
     }
   }
+
   void _removeVideo() {
     _videoController?.dispose();
     _videoController = null;
@@ -83,12 +88,14 @@ class _VideoPickerWidgetState extends State<VideoPickerWidget> {
     });
     widget.onValueChanged(widget.field.fieldId, null);
   }
+
   void _showError(String message) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: Colors.red),
     );
   }
+
   void _showPickerDialog() {
     showModalBottomSheet(
       context: context,
@@ -116,6 +123,7 @@ class _VideoPickerWidgetState extends State<VideoPickerWidget> {
       ),
     );
   }
+
   String _formatDuration(Duration duration) {
     String twoDigits(int n) => n.toString().padLeft(2, '0');
     final minutes = twoDigits(duration.inMinutes.remainder(60));
@@ -125,11 +133,13 @@ class _VideoPickerWidgetState extends State<VideoPickerWidget> {
     }
     return '$minutes:$seconds';
   }
+
   String _formatSize(int bytes) {
     if (bytes < 1024) return '$bytes B';
     if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
     return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
   }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -170,6 +180,7 @@ class _VideoPickerWidgetState extends State<VideoPickerWidget> {
       ),
     );
   }
+
   Widget _buildPickerArea(ThemeData theme) {
     return InkWell(
       onTap: _showPickerDialog,
@@ -182,20 +193,15 @@ class _VideoPickerWidgetState extends State<VideoPickerWidget> {
             style: BorderStyle.solid,
           ),
           borderRadius: BorderRadius.circular(12),
-          color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+          color: theme.colorScheme.surfaceContainerHighest.withValues(
+            alpha: 0.3,
+          ),
         ),
         child: Column(
           children: [
-            Icon(
-              Icons.video_call,
-              size: 48,
-              color: theme.colorScheme.primary,
-            ),
+            Icon(Icons.video_call, size: 48, color: theme.colorScheme.primary),
             const SizedBox(height: 12),
-            Text(
-              'Tap to add a video',
-              style: theme.textTheme.bodyLarge,
-            ),
+            Text('Tap to add a video', style: theme.textTheme.bodyLarge),
             const SizedBox(height: 4),
             Text(
               'Maximum 5 minutes, 100MB',
@@ -225,6 +231,7 @@ class _VideoPickerWidgetState extends State<VideoPickerWidget> {
       ),
     );
   }
+
   Widget _buildVideoPreview(ThemeData theme) {
     return Column(
       children: [
@@ -239,7 +246,11 @@ class _VideoPickerWidgetState extends State<VideoPickerWidget> {
                     ? VideoPlayer(_videoController!)
                     : Container(
                         color: Colors.black,
-                        child: const Icon(Icons.videocam, color: Colors.white54, size: 48),
+                        child: const Icon(
+                          Icons.videocam,
+                          color: Colors.white54,
+                          size: 48,
+                        ),
                       ),
               ),
             ),
@@ -252,8 +263,8 @@ class _VideoPickerWidgetState extends State<VideoPickerWidget> {
               ),
               child: IconButton(
                 icon: Icon(
-                  _videoController?.value.isPlaying == true 
-                      ? Icons.pause 
+                  _videoController?.value.isPlaying == true
+                      ? Icons.pause
                       : Icons.play_arrow,
                   color: Colors.white,
                   size: 32,
@@ -309,14 +320,24 @@ class _VideoPickerWidgetState extends State<VideoPickerWidget> {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        Icon(Icons.timer, size: 14, color: theme.colorScheme.outline),
+                        Icon(
+                          Icons.timer,
+                          size: 14,
+                          color: theme.colorScheme.outline,
+                        ),
                         const SizedBox(width: 4),
                         Text(
-                          _duration != null ? _formatDuration(_duration!) : '--:--',
+                          _duration != null
+                              ? _formatDuration(_duration!)
+                              : '--:--',
                           style: theme.textTheme.labelSmall,
                         ),
                         const SizedBox(width: 16),
-                        Icon(Icons.storage, size: 14, color: theme.colorScheme.outline),
+                        Icon(
+                          Icons.storage,
+                          size: 14,
+                          color: theme.colorScheme.outline,
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           _sizeBytes != null ? _formatSize(_sizeBytes!) : '--',

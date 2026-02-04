@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../models.dart';
+
 class SearchableDropdown extends StatefulWidget {
   final FieldModel field;
   final String? initialValue;
@@ -14,6 +15,7 @@ class SearchableDropdown extends StatefulWidget {
   @override
   State<SearchableDropdown> createState() => _SearchableDropdownState();
 }
+
 class _SearchableDropdownState extends State<SearchableDropdown> {
   final TextEditingController _controller = TextEditingController();
   @override
@@ -29,14 +31,17 @@ class _SearchableDropdownState extends State<SearchableDropdown> {
       }
     }
   }
+
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
-    if (widget.field.fieldOptions == null || widget.field.fieldOptions!.isEmpty) {
+    if (widget.field.fieldOptions == null ||
+        widget.field.fieldOptions!.isEmpty) {
       String hintText = 'No options available';
       switch (widget.field.fieldType) {
         case 'StateList':
@@ -59,14 +64,19 @@ class _SearchableDropdownState extends State<SearchableDropdown> {
           hintText: hintText,
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
           filled: true,
-          fillColor: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
-          suffixIcon: Icon(Icons.arrow_drop_down, color: Theme.of(context).disabledColor),
+          fillColor: Theme.of(
+            context,
+          ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+          suffixIcon: Icon(
+            Icons.arrow_drop_down,
+            color: Theme.of(context).disabledColor,
+          ),
         ),
       );
     }
     return LayoutBuilder(
       builder: (context, constraints) {
-        double dropdownWidth = 200.0;  
+        double dropdownWidth = 200.0;
         if (constraints.maxWidth.isFinite && constraints.maxWidth > 50) {
           dropdownWidth = math.max(150.0, constraints.maxWidth);
         }
@@ -75,20 +85,22 @@ class _SearchableDropdownState extends State<SearchableDropdown> {
           width: dropdownWidth,
           initialSelection: widget.initialValue,
           label: Text(widget.field.fieldName),
-          dropdownMenuEntries: widget.field.fieldOptions!.map<DropdownMenuEntry<String>>((option) {
-            return DropdownMenuEntry<String>(
-              value: option.value,
-              label: option.text,
-            );
-          }).toList(),
+          dropdownMenuEntries: widget.field.fieldOptions!
+              .map<DropdownMenuEntry<String>>((option) {
+                return DropdownMenuEntry<String>(
+                  value: option.value,
+                  label: option.text,
+                );
+              })
+              .toList(),
           onSelected: (String? value) {
             if (value != null) {
               widget.onValueChanged(value);
             }
           },
           inputDecorationTheme: InputDecorationTheme(
-             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-             filled: true,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            filled: true,
           ),
         );
       },

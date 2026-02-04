@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../models.dart';
+
 class ImagePickerWidget extends StatefulWidget {
   final FieldModel field;
   final Function(String, dynamic) onValueChanged;
@@ -13,6 +14,7 @@ class ImagePickerWidget extends StatefulWidget {
   @override
   State<ImagePickerWidget> createState() => _ImagePickerWidgetState();
 }
+
 class _ImagePickerWidgetState extends State<ImagePickerWidget> {
   XFile? _selectedImage;
   bool _isLoading = false;
@@ -42,6 +44,7 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
       });
     }
   }
+
   void _notifyValue() async {
     if (_selectedImage != null) {
       final file = File(_selectedImage!.path);
@@ -53,18 +56,21 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
       });
     }
   }
+
   void _removeImage() {
     setState(() {
       _selectedImage = null;
     });
     widget.onValueChanged(widget.field.fieldId, null);
   }
+
   void _showError(String message) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: Colors.red),
     );
   }
+
   void _showPickerDialog() {
     showModalBottomSheet(
       context: context,
@@ -92,6 +98,7 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
       ),
     );
   }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -126,6 +133,7 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
       ),
     );
   }
+
   Widget _buildPickerArea(ThemeData theme) {
     return InkWell(
       onTap: _showPickerDialog,
@@ -138,20 +146,15 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
             style: BorderStyle.solid,
           ),
           borderRadius: BorderRadius.circular(12),
-          color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+          color: theme.colorScheme.surfaceContainerHighest.withValues(
+            alpha: 0.3,
+          ),
         ),
         child: Column(
           children: [
-            Icon(
-              Icons.add_a_photo,
-              size: 48,
-              color: theme.colorScheme.primary,
-            ),
+            Icon(Icons.add_a_photo, size: 48, color: theme.colorScheme.primary),
             const SizedBox(height: 12),
-            Text(
-              'Tap to add an image',
-              style: theme.textTheme.bodyLarge,
-            ),
+            Text('Tap to add an image', style: theme.textTheme.bodyLarge),
             const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -174,6 +177,7 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
       ),
     );
   }
+
   Widget _buildImagePreview(ThemeData theme) {
     return Stack(
       children: [
@@ -239,9 +243,7 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
             ),
             child: Text(
               _selectedImage!.name,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: Colors.white,
-              ),
+              style: theme.textTheme.bodySmall?.copyWith(color: Colors.white),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),

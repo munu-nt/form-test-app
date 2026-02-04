@@ -4,6 +4,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import '../models.dart';
+
 class MapPickerWidget extends StatefulWidget {
   final FieldModel field;
   final Function(String, dynamic) onValueChanged;
@@ -15,9 +16,10 @@ class MapPickerWidget extends StatefulWidget {
   @override
   State<MapPickerWidget> createState() => _MapPickerWidgetState();
 }
+
 class _MapPickerWidgetState extends State<MapPickerWidget> {
   final MapController _mapController = MapController();
-  LatLng _selectedLocation = const LatLng(51.509364, -0.128928);  
+  LatLng _selectedLocation = const LatLng(51.509364, -0.128928);
   String? _selectedAddress;
   bool _isLoading = false;
   bool _isMapReady = false;
@@ -28,6 +30,7 @@ class _MapPickerWidgetState extends State<MapPickerWidget> {
       _determinePosition();
     });
   }
+
   Future<void> _determinePosition() async {
     setState(() {
       _isLoading = true;
@@ -67,6 +70,7 @@ class _MapPickerWidgetState extends State<MapPickerWidget> {
       });
     }
   }
+
   Future<void> _reverseGeocode(LatLng position) async {
     try {
       List<Placemark> placemarks = await placemarkFromCoordinates(
@@ -91,6 +95,7 @@ class _MapPickerWidgetState extends State<MapPickerWidget> {
       debugPrint('Reverse geocoding failed: $e');
     }
   }
+
   void _notifyValue() {
     widget.onValueChanged(widget.field.fieldId, {
       'latitude': _selectedLocation.latitude,
@@ -98,19 +103,22 @@ class _MapPickerWidgetState extends State<MapPickerWidget> {
       'address': _selectedAddress,
     });
   }
+
   void _onMapTap(TapPosition tapPosition, LatLng position) {
     setState(() {
       _selectedLocation = position;
-      _selectedAddress = null;  
+      _selectedAddress = null;
     });
     _reverseGeocode(position);
   }
+
   void _showError(String message) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -156,7 +164,8 @@ class _MapPickerWidgetState extends State<MapPickerWidget> {
                   ),
                   children: [
                     TileLayer(
-                      urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                      urlTemplate:
+                          'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                       userAgentPackageName: 'com.example.test_1',
                     ),
                     MarkerLayer(
@@ -220,7 +229,11 @@ class _MapPickerWidgetState extends State<MapPickerWidget> {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.location_pin, size: 16, color: theme.colorScheme.outline),
+                    Icon(
+                      Icons.location_pin,
+                      size: 16,
+                      color: theme.colorScheme.outline,
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       'Selected Location',

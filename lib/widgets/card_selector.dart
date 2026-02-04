@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models.dart';
+
 class CardSelector extends StatefulWidget {
   final FieldModel field;
   final Function(String, dynamic) onValueChanged;
@@ -13,6 +14,7 @@ class CardSelector extends StatefulWidget {
   @override
   State<CardSelector> createState() => _CardSelectorState();
 }
+
 class _CardSelectorState extends State<CardSelector> {
   String? _selectedValue;
   @override
@@ -20,6 +22,7 @@ class _CardSelectorState extends State<CardSelector> {
     super.initState();
     _selectedValue = widget.formData?[widget.field.fieldId]?.toString();
   }
+
   @override
   Widget build(BuildContext context) {
     if (widget.field.fieldOptions == null) return const SizedBox.shrink();
@@ -28,7 +31,9 @@ class _CardSelectorState extends State<CardSelector> {
         final isSelected = _selectedValue == option.value;
         return Card(
           elevation: isSelected ? 4 : 1,
-          color: isSelected ? Theme.of(context).colorScheme.primaryContainer : null,
+          color: isSelected
+              ? Theme.of(context).colorScheme.primaryContainer
+              : null,
           margin: const EdgeInsets.symmetric(vertical: 4),
           child: InkWell(
             onTap: widget.field.isReadOnly
@@ -49,8 +54,11 @@ class _CardSelectorState extends State<CardSelector> {
                       children: [
                         Text(
                           option.text,
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(
+                                fontWeight: isSelected
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
                               ),
                         ),
                         if (option.code != null)

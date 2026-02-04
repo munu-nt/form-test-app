@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models.dart';
+
 class AddressBookWidget extends StatefulWidget {
   final FieldModel field;
   final Function(String, dynamic) onValueChanged;
@@ -11,6 +12,7 @@ class AddressBookWidget extends StatefulWidget {
   @override
   State<AddressBookWidget> createState() => _AddressBookWidgetState();
 }
+
 class _AddressBookWidgetState extends State<AddressBookWidget> {
   final _addr1Ctrl = TextEditingController();
   final _addr2Ctrl = TextEditingController();
@@ -35,7 +37,9 @@ class _AddressBookWidgetState extends State<AddressBookWidget> {
           children: [
             Text(
               widget.field.fieldName,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             _buildTextField(controller: _addr1Ctrl, label: 'Address Line 1'),
@@ -44,31 +48,49 @@ class _AddressBookWidgetState extends State<AddressBookWidget> {
             const SizedBox(height: 8),
             Row(
               children: [
-                Expanded(child: _buildTextField(controller: _cityCtrl, label: 'City')),
+                Expanded(
+                  child: _buildTextField(controller: _cityCtrl, label: 'City'),
+                ),
                 const SizedBox(width: 8),
-                Expanded(child: _buildTextField(controller: _stateCtrl, label: 'State')),
+                Expanded(
+                  child: _buildTextField(
+                    controller: _stateCtrl,
+                    label: 'State',
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 8),
             Row(
               children: [
                 Expanded(
-                   child: _buildTextField(controller: _zipCtrl, label: 'Postal Code', isNumber: true)
+                  child: _buildTextField(
+                    controller: _zipCtrl,
+                    label: 'Postal Code',
+                    isNumber: true,
+                  ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: DropdownButtonFormField<String>(
                     decoration: InputDecoration(
                       labelText: 'Country',
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
                     ),
-                    value: _selectedCountry,
-                    items: _countries.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
+                    initialValue: _selectedCountry,
+                    items: _countries
+                        .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                        .toList(),
                     onChanged: (val) {
                       setState(() {
-                         _selectedCountry = val;
-                         _updateValue();
+                        _selectedCountry = val;
+                        _updateValue();
                       });
                     },
                   ),
@@ -80,6 +102,7 @@ class _AddressBookWidgetState extends State<AddressBookWidget> {
       ),
     );
   }
+
   Widget _buildTextField({
     required TextEditingController controller,
     required String label,
@@ -91,11 +114,15 @@ class _AddressBookWidgetState extends State<AddressBookWidget> {
       decoration: InputDecoration(
         labelText: label,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 12,
+        ),
       ),
       onChanged: (_) => _updateValue(),
     );
   }
+
   void _updateValue() {
     final addressData = {
       'AddressLine1': _addr1Ctrl.text,
