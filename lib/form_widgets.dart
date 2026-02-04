@@ -565,10 +565,13 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
   Widget _buildRadioButton() {
     return Column(
       children: widget.field.fieldOptions!.map((option) {
+        // ignore: deprecated_member_use
         return RadioListTile<String>(
           title: Text(option.text),
           value: option.value,
+          // ignore: deprecated_member_use
           groupValue: _dropdownValue,
+          // ignore: deprecated_member_use
           onChanged: widget.field.isReadOnly
               ? null
               : (value) {
@@ -625,7 +628,7 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
                 context: context,
                 initialTime: TimeOfDay.now(),
               );
-              if (pickedTime != null) {
+              if (pickedTime != null && mounted) {
                 String formattedTime = pickedTime.format(context);
                 setState(() {
                   _textController.text = formattedTime;
