@@ -3,10 +3,12 @@ import '../models.dart';
 class StarRating extends StatefulWidget {
   final FieldModel field;
   final Function(String, dynamic) onValueChanged;
+  final Map<String, dynamic>? formData;
   const StarRating({
     super.key,
     required this.field,
     required this.onValueChanged,
+    this.formData,
   });
   @override
   State<StarRating> createState() => _StarRatingState();
@@ -16,7 +18,8 @@ class _StarRatingState extends State<StarRating> {
   @override
   void initState() {
     super.initState();
-    _rating = int.tryParse(widget.field.fieldValue ?? '0') ?? 0;
+    final savedValue = widget.formData?[widget.field.fieldId];
+    _rating = int.tryParse(savedValue?.toString() ?? '0') ?? 0;
   }
   @override
   Widget build(BuildContext context) {

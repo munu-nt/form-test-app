@@ -48,8 +48,9 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
   @override
   void initState() {
     super.initState();
-    _textController = TextEditingController(text: widget.field.fieldValue);
-    _dropdownValue = widget.field.fieldValue;
+    final savedValue = widget.formData[widget.field.fieldId];
+    _textController = TextEditingController(text: savedValue?.toString());
+    _dropdownValue = savedValue?.toString();
     if (_dropdownValue != null && widget.field.fieldOptions != null) {
       final validValues = widget.field.fieldOptions!
           .map((e) => e.value)
@@ -230,6 +231,7 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
                 key: Key(widget.field.fieldId),
                 field: widget.field,
                 onValueChanged: widget.onValueChanged,
+                formData: widget.formData,
             );
         }
         if (widget.field.fieldType == 'CheckBox') {
@@ -237,6 +239,7 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
              key: Key(widget.field.fieldId),
              field: widget.field,
              onValueChanged: widget.onValueChanged,
+             formData: widget.formData,
            );
         }
       if (widget.field.fieldType == 'RadioButton') {
@@ -276,7 +279,8 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
          return StarRating(
              key: Key(widget.field.fieldId),
              field: widget.field, 
-             onValueChanged: widget.onValueChanged
+             onValueChanged: widget.onValueChanged,
+             formData: widget.formData,
          );
       case 'Divider':
         return _buildDivider();
@@ -319,12 +323,14 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
           key: Key(widget.field.fieldId),
           field: widget.field,
           onValueChanged: widget.onValueChanged,
+          formData: widget.formData,
         );
       case 'Discount':
         return DiscountWidget(
           key: Key(widget.field.fieldId),
           field: widget.field,
           onValueChanged: widget.onValueChanged,
+          formData: widget.formData,
         );
       case 'PaymentSummary':
         return PaymentSummaryWidget(
@@ -387,6 +393,7 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
            key: Key(widget.field.fieldId),
            field: widget.field,
            onValueChanged: widget.onValueChanged,
+           formData: widget.formData,
          );
       case 'WebView':
       case 'web_view':
@@ -419,6 +426,7 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
            key: Key(widget.field.fieldId),
            field: widget.field,
            onValueChanged: widget.onValueChanged,
+           formData: widget.formData,
          );
       case 'AddressBook':
          return AddressBookWidget(

@@ -3,10 +3,12 @@ import '../models.dart';
 class CheckBoxWidget extends StatefulWidget {
   final FieldModel field;
   final Function(String, dynamic) onValueChanged;
+  final Map<String, dynamic>? formData;
   const CheckBoxWidget({
     super.key,
     required this.field,
     required this.onValueChanged,
+    this.formData,
   });
   @override
   State<CheckBoxWidget> createState() => _CheckBoxWidgetState();
@@ -16,8 +18,9 @@ class _CheckBoxWidgetState extends State<CheckBoxWidget> {
   @override
   void initState() {
     super.initState();
-    if (widget.field.fieldValue != null && widget.field.fieldValue!.isNotEmpty) {
-      _selectedValues.addAll(widget.field.fieldValue!.split(','));
+    final savedValue = widget.formData?[widget.field.fieldId];
+    if (savedValue != null && savedValue.toString().isNotEmpty) {
+      _selectedValues.addAll(savedValue.toString().split(','));
     }
   }
   @override

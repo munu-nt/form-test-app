@@ -3,10 +3,12 @@ import '../models.dart';
 class CardSelector extends StatefulWidget {
   final FieldModel field;
   final Function(String, dynamic) onValueChanged;
+  final Map<String, dynamic>? formData;
   const CardSelector({
     super.key,
     required this.field,
     required this.onValueChanged,
+    this.formData,
   });
   @override
   State<CardSelector> createState() => _CardSelectorState();
@@ -16,7 +18,7 @@ class _CardSelectorState extends State<CardSelector> {
   @override
   void initState() {
     super.initState();
-    _selectedValue = widget.field.fieldValue;
+    _selectedValue = widget.formData?[widget.field.fieldId]?.toString();
   }
   @override
   Widget build(BuildContext context) {

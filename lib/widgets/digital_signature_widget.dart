@@ -6,10 +6,12 @@ import '../models.dart';
 class DigitalSignatureWidget extends StatefulWidget {
   final FieldModel field;
   final Function(String, dynamic) onValueChanged;
+  final Map<String, dynamic>? formData;
   const DigitalSignatureWidget({
     super.key,
     required this.field,
     required this.onValueChanged,
+    this.formData,
   });
   @override
   State<DigitalSignatureWidget> createState() => _DigitalSignatureWidgetState();
@@ -27,6 +29,21 @@ class _DigitalSignatureWidgetState extends State<DigitalSignatureWidget> {
       exportBackgroundColor: Colors.white,
     );
     _signatureController.addListener(_onSignatureChanged);
+    _restoreSavedSignature();
+  }
+  void _restoreSavedSignature() {
+    final savedData = widget.formData?[widget.field.fieldId];
+    if (savedData != null && savedData is Map && savedData['signature'] != null) {
+      try {
+        final bytes = base64Decode(savedData['signature']);
+        setState(() {
+          _signatureBytes = bytes;
+          _hasSignature = true;
+        });
+      } catch (e) {
+        debugPrint('Failed to restore signature: $e');
+      }
+    }
   }
   void _onSignatureChanged() {
     final hasPoints = _signatureController.isNotEmpty;

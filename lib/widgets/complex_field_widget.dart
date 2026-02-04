@@ -47,7 +47,7 @@ class ComplexFieldWidget extends StatelessWidget {
           fieldId: virtualId,
           fieldName: child.fieldName,
           fieldType: child.fieldType,
-          fieldValue: currentGroupData[child.fieldName] ?? child.fieldValue,
+          fieldValue: currentGroupData[child.fieldName]?.toString(),
           isMandate: child.isMandate,
           fieldOptions: child.fieldOptions,
           sequence: child.sequence,

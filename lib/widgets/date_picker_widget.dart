@@ -4,10 +4,12 @@ import '../models.dart';
 class DatePickerWidget extends StatefulWidget {
   final FieldModel field;
   final Function(String, dynamic) onValueChanged;
+  final Map<String, dynamic>? formData;
   const DatePickerWidget({
     super.key,
     required this.field,
     required this.onValueChanged,
+    this.formData,
   });
   @override
   State<DatePickerWidget> createState() => _DatePickerWidgetState();
@@ -21,20 +23,21 @@ class _DatePickerWidgetState extends State<DatePickerWidget> {
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController(text: widget.field.fieldValue);
-    _parseInitialValue();
+    final savedValue = widget.formData?[widget.field.fieldId]?.toString();
+    _controller = TextEditingController(text: savedValue);
+    _parseInitialValue(savedValue);
   }
-  void _parseInitialValue() {
-    if (widget.field.fieldValue != null && widget.field.fieldValue!.isNotEmpty) {
+  void _parseInitialValue(String? value) {
+    if (value != null && value.isNotEmpty) {
       try {
         if (_isDateTimeField) {
-          _selectedDate = DateFormat(_dateTimeFormat).parse(widget.field.fieldValue!);
+          _selectedDate = DateFormat(_dateTimeFormat).parse(value);
           _selectedTime = TimeOfDay.fromDateTime(_selectedDate!);
         } else {
-          _selectedDate = DateFormat(_dateFormat).parse(widget.field.fieldValue!);
+          _selectedDate = DateFormat(_dateFormat).parse(value);
         }
       } catch (e) {
-        debugPrint('Failed to parse date value: ${widget.field.fieldValue}');
+        debugPrint('Failed to parse date value: $value');
       }
     }
   }

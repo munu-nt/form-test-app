@@ -4,10 +4,12 @@ import '../models.dart';
 class DiscountWidget extends StatefulWidget {
   final FieldModel field;
   final Function(String, dynamic) onValueChanged;
+  final Map<String, dynamic>? formData;
   const DiscountWidget({
     super.key,
     required this.field,
     required this.onValueChanged,
+    this.formData,
   });
   @override
   State<DiscountWidget> createState() => _DiscountWidgetState();
@@ -18,7 +20,8 @@ class _DiscountWidgetState extends State<DiscountWidget> {
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController(text: widget.field.fieldValue ?? '0');
+    final savedValue = widget.formData?[widget.field.fieldId];
+    _controller = TextEditingController(text: savedValue?.toString() ?? '0');
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _notifyValueChange();
     });
