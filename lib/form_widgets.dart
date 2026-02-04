@@ -596,8 +596,10 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
           title: Text(option.text),
           value: option.value,
           
+          // ignore: deprecated_member_use
           groupValue: _dropdownValue,
           
+          // ignore: deprecated_member_use
           onChanged: widget.field.isReadOnly
               ? null
               : (value) {
