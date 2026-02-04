@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
           filled: true,
         ),
       ),
-      themeMode: ThemeMode.system,
+      themeMode: ThemeMode.light,
       home: const FormPage(),
     );
   }
