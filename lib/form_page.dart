@@ -34,25 +34,20 @@ class _FormPageState extends State<FormPage> {
 
   Future<void> _submitForm() async {
     final provider = context.read<FormProvider>();
-    if (_formKey.currentState!.validate()) {
-      await provider.saveFormData();
+    
+    // 1. Run provider-level validation (checks all fields, including off-screen ones)
+    final errors = provider.validateForm();
+
+    if (errors.isNotEmpty) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('💾 Form data saved to database'),
-          backgroundColor: Colors.blue.shade600,
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(seconds: 2),
-        ),
-      );
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
           title: const Row(
             children: [
-              Icon(Icons.check_circle, color: Colors.green),
+              Icon(Icons.error_outline, color: Colors.red),
               SizedBox(width: 8),
-              Text('Success'),
+              Text('Validation Error'),
             ],
           ),
           content: SingleChildScrollView(
@@ -60,34 +55,88 @@ class _FormPageState extends State<FormPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Tooltip(
-                  message: 'Data will persist when app reopens',
+                const Text('Please fix the following errors before submitting:'),
+                const SizedBox(height: 12),
+                ...errors.map((e) => Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 2.0),
                   child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(Icons.info_outline, size: 16, color: Colors.grey),
-                      SizedBox(width: 4),
-                      Text('Form saved successfully!'),
+                      const Text('• ', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+                      Expanded(child: Text(e)),
                     ],
                   ),
-                ),
-                const SizedBox(height: 8),
-                Text(const JsonEncoder.withIndent('  ').convert(provider.formData)),
+                )),
               ],
             ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Close'),
+              child: const Text('OK'),
             ),
           ],
         ),
       );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fix the errors in the form')),
-      );
+      return; 
     }
+
+    // 2. Determine if we should proceed with FormState validation (only checks visible widgets)
+    // Since provider validation passed, we know all data is good. 
+    // We can skip _formKey.currentState!.validate() or keep it as a secondary UI check (e.g. focused fields).
+    // It's safer to rely on provider validation for "completeness" and maybe run UI validation for "visual feedback" if needed,
+    // but the error dialog is quite clear. Let's rely on provider logic primarily.
+
+    await provider.saveFormData();
+    if (!mounted) return;
+    
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('💾 Form data saved to database'),
+        backgroundColor: Colors.blue.shade600,
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 2),
+      ),
+    );
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.check_circle, color: Colors.green),
+            SizedBox(width: 8),
+            Text('Success'),
+          ],
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Tooltip(
+                message: 'Data will persist when app reopens',
+                child: Row(
+                  children: [
+                    Icon(Icons.info_outline, size: 16, color: Colors.grey),
+                    SizedBox(width: 4),
+                    Text('Form saved successfully!'),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(const JsonEncoder.withIndent('  ').convert(provider.formData)),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _clearDatabase() async {

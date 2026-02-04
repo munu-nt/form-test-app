@@ -104,4 +104,42 @@ class FormProvider extends ChangeNotifier {
     _formData.clear();
     notifyListeners();
   }
+
+  List<String> validateForm() {
+    final List<String> errors = [];
+    final fieldsToCheck = visibleFields;
+
+    for (final field in fieldsToCheck) {
+      if (field.isReadOnly) continue;
+
+      final value = _formData[field.fieldId];
+      final exists = value != null && value.toString().trim().isNotEmpty;
+
+      // 1. Mandatory Check
+      if (field.isMandate && !exists) {
+        errors.add('${field.fieldName} is required');
+        continue;
+      }
+
+      // 2. Format Checks (Email)
+      if (exists && (field.fieldType == 'Email' || field.fieldType == 'EmailID')) {
+        final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+        if (!emailRegex.hasMatch(value.toString())) {
+          errors.add('${field.fieldName}: Invalid email address');
+        }
+      }
+
+      // 3. Format Checks (Postal Code - US Only logic copied from widget)
+      if (exists && field.fieldType == 'PostalCode') {
+        // Assuming '2005' is the Country field ID as per widget logic
+        String? countryValue = _formData['2005']; 
+        if (countryValue == 'US') {
+          if (!RegExp(r'^\d{5}(?:[-\s]\d{4})?$').hasMatch(value.toString())) {
+             errors.add('${field.fieldName}: Invalid US Postal Code');
+          }
+        }
+      }
+    }
+    return errors;
+  }
 }

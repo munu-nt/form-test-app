@@ -47,12 +47,24 @@ class DynamicFormField extends StatefulWidget {
 class _DynamicFormFieldState extends State<DynamicFormField> {
   late TextEditingController _textController;
   String? _dropdownValue;
+  String? _parentFieldId;
+  String? _lastParentValue;
+
   @override
   void initState() {
     super.initState();
     final savedValue = widget.formData[widget.field.fieldId];
     _textController = TextEditingController(text: savedValue?.toString());
     _dropdownValue = savedValue?.toString();
+    
+    // Initialize dependency tracking
+    if (widget.field.isDependent) {
+      _parentFieldId = _findParentFieldId();
+      if (_parentFieldId != null) {
+        _lastParentValue = widget.formData[_parentFieldId];
+      }
+    }
+
     if (_dropdownValue != null && widget.field.fieldOptions != null) {
       final validValues = widget.field.fieldOptions!
           .map((e) => e.value)
@@ -66,19 +78,33 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
   @override
   void didUpdateWidget(covariant DynamicFormField oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.formData != oldWidget.formData) {
-      _checkDependencyValidity();
+    
+    // Check for parent value changes
+    if (_parentFieldId != null) {
+      final currentParentValue = widget.formData[_parentFieldId];
+      if (currentParentValue != _lastParentValue) {
+        _lastParentValue = currentParentValue;
+        _checkDependencyValidity();
+      }
+    } else if (widget.formData != oldWidget.formData) {
+       // Fallback for other changes, though likely checking references which might be same
+       // But keeping for safety if new map is passed
     }
   }
 
   void _checkDependencyValidity() {
     if (widget.field.fieldOptions == null) return;
+    
+    // If parent value is cleared/changed, we might need to clear our value
     List<FieldOptionModel> currentOptions = _getFilteredOptions();
+    
+    // If we have a value selected that isn't in the new valid options, clear it
     if (_dropdownValue != null &&
         !currentOptions.any((op) => op.value == _dropdownValue)) {
       setState(() {
         _dropdownValue = null;
       });
+      widget.onValueChanged(widget.field.fieldId, null);
     }
   }
 
