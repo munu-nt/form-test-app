@@ -204,11 +204,8 @@ class _DatePickerWidgetState extends State<DatePickerWidget> {
           readOnly: true,
           validator: _validate,
           decoration: InputDecoration(
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-            filled: true,
-            fillColor: Theme.of(
-              context,
-            ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+            filled: false,
             suffixIcon: Icon(
               _isDateTimeField ? Icons.access_time : Icons.calendar_today,
             ),

@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
             brightness: Brightness.light,
           ),
           inputDecorationTheme: InputDecorationTheme(
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
             filled: true,
           ),
         ),
@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
             brightness: Brightness.dark,
           ),
           inputDecorationTheme: InputDecorationTheme(
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
             filled: true,
           ),
         ),

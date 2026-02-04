@@ -6,12 +6,14 @@ import 'package:test_1/models.dart';
 class FormProvider extends ChangeNotifier {
   FormModel? _formModel;
   bool _isLoading = true;
+  bool _isClearing = false;
   String? _errorMessage;
   final Map<String, dynamic> _formData = {};
   bool _isDataLoaded = false;
 
   FormModel? get formModel => _formModel;
   bool get isLoading => _isLoading;
+  bool get isClearing => _isClearing;
   String? get errorMessage => _errorMessage;
   Map<String, dynamic> get formData => _formData;
 
@@ -112,10 +114,21 @@ class FormProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> clearData() async {
+  Future<void> clearData(AssetBundle bundle) async {
+    _isLoading = true;
+    _isClearing = true;
+    notifyListeners();
+    
     await DatabaseHelper.clearFormData();
     _formData.clear();
     _fieldErrors.clear();
+    _isDataLoaded = false;
+    
+    await Future.delayed(const Duration(milliseconds: 300));
+    
+    await loadFormData(bundle);
+    
+    _isClearing = false;
     notifyListeners();
   }
 
@@ -123,7 +136,7 @@ class FormProvider extends ChangeNotifier {
     final List<ValidationError> errors = [];
     final fieldsToCheck = visibleFields;
 
-    _fieldErrors.clear(); // Clear previous errors before validation run
+    _fieldErrors.clear();
 
     for (final field in fieldsToCheck) {
       if (field.isReadOnly) continue;
@@ -131,7 +144,40 @@ class FormProvider extends ChangeNotifier {
       final value = _formData[field.fieldId];
       final exists = value != null && value.toString().trim().isNotEmpty;
 
-      // 1. Mandatory Check
+      if (field.fieldType == 'GroupedFields') {
+        if (value is List) {
+          _validateGroupedFields(field, value, errors);
+        } else if (field.isMandate) {
+             final error = ValidationError(
+                  fieldId: field.fieldId,
+                  message: '${field.fieldName} is required',
+                );
+                errors.add(error);
+                _fieldErrors[field.fieldId] = error.message;
+        }
+        continue;
+      }
+      
+      if ([
+        'EmergencyContact',
+        'UserProfile',
+        'ProgramContactProfile',
+        'PhoneBook',
+        'ProgramProfile'
+      ].contains(field.fieldType)) {
+        if (value is Map) {
+          _validateComplexFields(field, value, errors);
+        } else if (field.isMandate) {
+             final error = ValidationError(
+                  fieldId: field.fieldId,
+                  message: '${field.fieldName} is required',
+                );
+                errors.add(error);
+                _fieldErrors[field.fieldId] = error.message;
+        }
+        continue;
+      }
+
       if (field.isMandate && !exists) {
         final error = ValidationError(
           fieldId: field.fieldId,
@@ -142,7 +188,6 @@ class FormProvider extends ChangeNotifier {
         continue;
       }
 
-      // 2. Format Checks (Email)
       if (exists && (field.fieldType == 'Email' || field.fieldType == 'EmailID')) {
         final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
         if (!emailRegex.hasMatch(value.toString())) {
@@ -155,9 +200,7 @@ class FormProvider extends ChangeNotifier {
         }
       }
 
-      // 3. Format Checks (Postal Code - US Only logic copied from widget)
       if (exists && field.fieldType == 'PostalCode') {
-        // Assuming '2005' is the Country field ID as per widget logic
         String? countryValue = _formData['2005']; 
         if (countryValue == 'US') {
           if (!RegExp(r'^\d{5}(?:[-\s]\d{4})?$').hasMatch(value.toString())) {
@@ -173,11 +216,96 @@ class FormProvider extends ChangeNotifier {
     }
     
     if (errors.isNotEmpty) {
-      notifyListeners(); // Notify to update UI with errors
+      notifyListeners();
     }
     
     return errors;
   }
+
+  void _validateGroupedFields(FieldModel parentField, List<dynamic> groups, List<ValidationError> errors) {
+    if (parentField.subFields == null) return;
+
+    for (int i = 0; i < groups.length; i++) {
+      final groupData = groups[i];
+      if (groupData is! Map) continue;
+
+      for (final subField in parentField.subFields!) {
+         final uniqueId = '${parentField.fieldId}_${i}_${subField.fieldId}';
+         _performSingleFieldValidation(subField, groupData[subField.fieldId], uniqueId, errors);
+      }
+    }
+  }
+
+  void _validateComplexFields(FieldModel parentField, dynamic data, List<ValidationError> errors) {
+     if (_formModel == null) return;
+     
+     final children = _formModel!.fields.where(
+        (f) => f.fieldId == parentField.fieldId && f.fieldType != parentField.fieldType
+     ).toList();
+     
+     children.sort((a, b) {
+        int seqA = int.tryParse(a.sequence ?? "0") ?? 0;
+        int seqB = int.tryParse(b.sequence ?? "0") ?? 0;
+        return seqA.compareTo(seqB);
+     });
+     
+     if (data is! Map) return;
+
+     final Set<String> generatedIds = {};
+
+     for (var child in children) {
+        String virtualId = "${parentField.fieldId}_${child.fieldName.replaceAll(RegExp(r'\s+'), '')}";
+        if (generatedIds.contains(virtualId)) {
+           virtualId = "${virtualId}_${child.index}";
+        }
+        generatedIds.add(virtualId);
+        
+        
+        
+        _performSingleFieldValidation(child, data[child.fieldName], virtualId, errors);
+     }
+  }
+
+  void _performSingleFieldValidation(FieldModel field, dynamic value, String uniqueIdForError, List<ValidationError> errors) {
+      final exists = value != null && value.toString().trim().isNotEmpty;
+      
+      if (field.isMandate && !exists) {
+        final error = ValidationError(
+          fieldId: uniqueIdForError,
+          message: '${field.fieldName} is required',
+        );
+        errors.add(error);
+        _fieldErrors[uniqueIdForError] = error.message;
+        return;
+      }
+
+      if (exists && (field.fieldType == 'Email' || field.fieldType == 'EmailID')) {
+        final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+        if (!emailRegex.hasMatch(value.toString())) {
+          final error = ValidationError(
+            fieldId: uniqueIdForError,
+            message: '${field.fieldName}: Invalid email address',
+          );
+          errors.add(error);
+          _fieldErrors[uniqueIdForError] = error.message;
+        }
+      }
+
+      if (exists && field.fieldType == 'PostalCode') {
+        String? countryValue = _formData['2005']; 
+        if (countryValue == 'US') {
+          if (!RegExp(r'^\d{5}(?:[-\s]\d{4})?$').hasMatch(value.toString())) {
+             final error = ValidationError(
+               fieldId: uniqueIdForError,
+               message: '${field.fieldName}: Invalid US Postal Code',
+             );
+             errors.add(error);
+             _fieldErrors[uniqueIdForError] = error.message;
+          }
+        }
+      }
+  }
+
 }
 
 class ValidationError {

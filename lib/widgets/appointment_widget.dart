@@ -178,9 +178,12 @@ class _AppointmentWidgetState extends State<AppointmentWidget> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Card(
+    return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
-      elevation: 2,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: theme.colorScheme.outlineVariant),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -464,9 +467,9 @@ class _AppointmentWidgetState extends State<AppointmentWidget> {
         ),
         const SizedBox(height: 16),
         DropdownButtonFormField<String>(
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'Campus',
-            border: OutlineInputBorder(),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
             prefixIcon: Icon(Icons.business),
           ),
           initialValue: _selectedCampus,
@@ -484,9 +487,9 @@ class _AppointmentWidgetState extends State<AppointmentWidget> {
         const SizedBox(height: 16),
         TextFormField(
           controller: _descCtrl,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'Description',
-            border: OutlineInputBorder(),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
             prefixIcon: Icon(Icons.description),
           ),
           maxLines: 2,
@@ -495,9 +498,9 @@ class _AppointmentWidgetState extends State<AppointmentWidget> {
         const SizedBox(height: 12),
         TextFormField(
           controller: _reasonCtrl,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'Reason for Appointment',
-            border: OutlineInputBorder(),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
             prefixIcon: Icon(Icons.help_outline),
           ),
           onChanged: (_) => _updateValue(),
@@ -505,9 +508,9 @@ class _AppointmentWidgetState extends State<AppointmentWidget> {
         const SizedBox(height: 12),
         TextFormField(
           controller: _emailCtrl,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'Contact Email',
-            border: OutlineInputBorder(),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
             prefixIcon: Icon(Icons.email),
           ),
           keyboardType: TextInputType.emailAddress,
@@ -527,7 +530,7 @@ class _AppointmentWidgetState extends State<AppointmentWidget> {
             theme.colorScheme.secondaryContainer,
           ],
         ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

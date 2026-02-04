@@ -6,11 +6,13 @@ class SearchableDropdown extends StatefulWidget {
   final FieldModel field;
   final String? initialValue;
   final Function(String) onValueChanged;
+  final String? errorText;
   const SearchableDropdown({
     super.key,
     required this.field,
     this.initialValue,
     required this.onValueChanged,
+    this.errorText,
   });
   @override
   State<SearchableDropdown> createState() => _SearchableDropdownState();
@@ -62,7 +64,7 @@ class _SearchableDropdownState extends State<SearchableDropdown> {
         decoration: InputDecoration(
           labelText: widget.field.fieldName,
           hintText: hintText,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
           filled: true,
           fillColor: Theme.of(
             context,
@@ -80,28 +82,56 @@ class _SearchableDropdownState extends State<SearchableDropdown> {
         if (constraints.maxWidth.isFinite && constraints.maxWidth > 50) {
           dropdownWidth = math.max(150.0, constraints.maxWidth);
         }
-        return DropdownMenu<String>(
-          controller: _controller,
-          width: dropdownWidth,
-          initialSelection: widget.initialValue,
-          label: Text(widget.field.fieldName),
-          dropdownMenuEntries: widget.field.fieldOptions!
-              .map<DropdownMenuEntry<String>>((option) {
-                return DropdownMenuEntry<String>(
-                  value: option.value,
-                  label: option.text,
-                );
-              })
-              .toList(),
-          onSelected: (String? value) {
-            if (value != null) {
-              widget.onValueChanged(value);
-            }
-          },
-          inputDecorationTheme: InputDecorationTheme(
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-            filled: true,
-          ),
+        final hasError = widget.errorText != null && widget.errorText!.isNotEmpty;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            DropdownMenu<String>(
+              controller: _controller,
+              width: dropdownWidth,
+              initialSelection: widget.initialValue,
+              label: Text(widget.field.fieldName),
+              dropdownMenuEntries: widget.field.fieldOptions!
+                  .map<DropdownMenuEntry<String>>((option) {
+                    return DropdownMenuEntry<String>(
+                      value: option.value,
+                      label: option.text,
+                    );
+                  })
+                  .toList(),
+              onSelected: (String? value) {
+                if (value != null) {
+                  widget.onValueChanged(value);
+                }
+              },
+              inputDecorationTheme: InputDecorationTheme(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: hasError 
+                      ? BorderSide(color: Theme.of(context).colorScheme.error, width: 2)
+                      : const BorderSide(),
+                ),
+                enabledBorder: hasError
+                    ? OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(color: Theme.of(context).colorScheme.error, width: 2),
+                      )
+                    : null,
+                filled: true,
+              ),
+            ),
+            if (hasError)
+              Padding(
+                padding: const EdgeInsets.only(left: 12, top: 4),
+                child: Text(
+                  widget.errorText!,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.error,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+          ],
         );
       },
     );

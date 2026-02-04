@@ -188,7 +188,6 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
   Widget build(BuildContext context) {
     if (widget.field.hideField) return const SizedBox.shrink();
     
-    // Watch provider to rebuild when error state changes
     final provider = context.watch<FormProvider>();
     final errorText = provider.getFieldError(widget.field.fieldId);
 
@@ -202,33 +201,15 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
               widget.field.fieldType != 'HtmlViewer')
             _buildLabel(),
           const SizedBox(height: 8),
-          _buildInput(errorText), // Pass errorText to input builder
+          _buildInput(errorText),
         ],
       ),
     );
   }
 
   Widget _buildLabel() {
-    
     return Row(
       children: [
-        /*
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-          margin: const EdgeInsets.only(right: 8),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primaryContainer,
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: Text(
-            '$displayIdx',
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: Theme.of(context).colorScheme.onPrimaryContainer,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        */
         Expanded(
           child: RichText(
             text: TextSpan(
@@ -250,21 +231,6 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
             ),
           ),
         ),
-        /*
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: Text(
-            'ID: ${widget.field.fieldId}',
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ),
-        */
       ],
     );
   }
@@ -292,7 +258,12 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
         return InputDecorator(
           decoration: InputDecoration(
             errorText: errorText,
+            filled: false,
             border: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            focusedBorder: InputBorder.none,
+            errorBorder: InputBorder.none,
+            focusedErrorBorder: InputBorder.none,
             contentPadding: EdgeInsets.zero,
           ),
           child: CheckBoxWidget(
@@ -343,11 +314,11 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
           key: Key(widget.field.fieldId),
           field: filteredField,
           initialValue: _dropdownValue,
+          errorText: errorText,
           onValueChanged: (val) {
             setState(() => _dropdownValue = val);
             widget.onValueChanged(widget.field.fieldId, val);
-            // Clear error on change
-             context.read<FormProvider>().updateValue(widget.field.fieldId, val);
+            context.read<FormProvider>().updateValue(widget.field.fieldId, val);
           },
         );
       }
@@ -358,7 +329,12 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
         return InputDecorator(
           decoration: InputDecoration(
             errorText: errorText,
+            filled: false,
             border: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            focusedBorder: InputBorder.none,
+            errorBorder: InputBorder.none,
+            focusedErrorBorder: InputBorder.none,
             contentPadding: EdgeInsets.zero,
           ),
           child: StarRating(
@@ -378,7 +354,12 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
         return InputDecorator(
           decoration: InputDecoration(
             errorText: errorText,
+            filled: false,
             border: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            focusedBorder: InputBorder.none,
+            errorBorder: InputBorder.none,
+            focusedErrorBorder: InputBorder.none,
             contentPadding: EdgeInsets.zero,
           ),
           child: FileUploadWidget(
@@ -391,7 +372,12 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
         return InputDecorator(
           decoration: InputDecoration(
             errorText: errorText,
+            filled: false,
             border: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            focusedBorder: InputBorder.none,
+            errorBorder: InputBorder.none,
+            focusedErrorBorder: InputBorder.none,
             contentPadding: EdgeInsets.zero,
           ),
           child: MultiFileUploadWidget(
@@ -410,7 +396,12 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
         return InputDecorator(
           decoration: InputDecoration(
             errorText: errorText,
+            filled: false,
             border: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            focusedBorder: InputBorder.none,
+            errorBorder: InputBorder.none,
+            focusedErrorBorder: InputBorder.none,
             contentPadding: EdgeInsets.zero,
           ),
           child: ImagePickerWidget(
@@ -423,7 +414,12 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
         return InputDecorator(
           decoration: InputDecoration(
             errorText: errorText,
+            filled: false,
             border: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            focusedBorder: InputBorder.none,
+            errorBorder: InputBorder.none,
+            focusedErrorBorder: InputBorder.none,
             contentPadding: EdgeInsets.zero,
           ),
           child: VideoPickerWidget(
@@ -436,7 +432,12 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
         return InputDecorator(
           decoration: InputDecoration(
             errorText: errorText,
+            filled: false,
             border: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            focusedBorder: InputBorder.none,
+            errorBorder: InputBorder.none,
+            focusedErrorBorder: InputBorder.none,
             contentPadding: EdgeInsets.zero,
           ),
           child: DigitalSignatureWidget(
@@ -471,7 +472,12 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
         return InputDecorator(
           decoration: InputDecoration(
             errorText: errorText,
+            filled: false,
             border: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            focusedBorder: InputBorder.none,
+            errorBorder: InputBorder.none,
+            focusedErrorBorder: InputBorder.none,
             contentPadding: EdgeInsets.zero,
           ),
           child: MultiWebUrlWidget(
@@ -502,7 +508,12 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
         return InputDecorator(
           decoration: InputDecoration(
             errorText: errorText,
+            filled: false,
             border: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            focusedBorder: InputBorder.none,
+            errorBorder: InputBorder.none,
+            focusedErrorBorder: InputBorder.none,
             contentPadding: EdgeInsets.zero,
           ),
           child: EConsentWidget(
@@ -515,7 +526,12 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
         return InputDecorator(
           decoration: InputDecoration(
             errorText: errorText,
+            filled: false,
             border: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            focusedBorder: InputBorder.none,
+            errorBorder: InputBorder.none,
+            focusedErrorBorder: InputBorder.none,
             contentPadding: EdgeInsets.zero,
           ),
           child: GpsLocationWidget(
@@ -528,7 +544,12 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
         return InputDecorator(
           decoration: InputDecoration(
             errorText: errorText,
+            filled: false,
             border: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            focusedBorder: InputBorder.none,
+            errorBorder: InputBorder.none,
+            focusedErrorBorder: InputBorder.none,
             contentPadding: EdgeInsets.zero,
           ),
           child: MapPickerWidget(
@@ -541,7 +562,12 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
         return InputDecorator(
           decoration: InputDecoration(
             errorText: errorText,
+            filled: false,
             border: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            focusedBorder: InputBorder.none,
+            errorBorder: InputBorder.none,
+            focusedErrorBorder: InputBorder.none,
             contentPadding: EdgeInsets.zero,
           ),
           child: CheckBoxWidget(
@@ -592,7 +618,12 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
         return InputDecorator(
           decoration: InputDecoration(
             errorText: errorText,
+            filled: false,
             border: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            focusedBorder: InputBorder.none,
+            errorBorder: InputBorder.none,
+            focusedErrorBorder: InputBorder.none,
             contentPadding: EdgeInsets.zero,
           ),
           child: DatePickerWidget(
@@ -611,7 +642,12 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
         return InputDecorator(
           decoration: InputDecoration(
             errorText: errorText,
+            filled: false,
             border: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            focusedBorder: InputBorder.none,
+            errorBorder: InputBorder.none,
+            focusedErrorBorder: InputBorder.none,
             contentPadding: EdgeInsets.zero,
           ),
           child: AppointmentWidget(
@@ -702,20 +738,20 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
     return InputDecorator(
       decoration: InputDecoration(
         errorText: errorText,
+        filled: false,
         border: InputBorder.none,
+        enabledBorder: InputBorder.none,
+        focusedBorder: InputBorder.none,
+        errorBorder: InputBorder.none,
+        focusedErrorBorder: InputBorder.none,
         contentPadding: EdgeInsets.zero,
       ),
       child: Column(
         children: widget.field.fieldOptions!.map((option) {
-        
         return RadioListTile<String>(
           title: Text(option.text),
           value: option.value,
-          
-          // ignore: deprecated_member_use
           groupValue: _dropdownValue,
-          
-          // ignore: deprecated_member_use
           onChanged: widget.field.isReadOnly
               ? null
               : (value) {
@@ -735,7 +771,7 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
   Widget _buildDropdown(String? errorText) {
     return DropdownButtonFormField<String>(
       decoration: InputDecoration(
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
         errorText: errorText,
       ),
       initialValue: _dropdownValue,
@@ -784,7 +820,7 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
           readOnly: true,
           validator: _validateField,
           decoration: InputDecoration(
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
             suffixIcon: const Icon(Icons.access_time),
             errorText: errorText,
           ),
@@ -807,7 +843,7 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
       keyboardType: inputType,
       maxLines: isTextArea || widget.field.fieldType == 'AddressBook' ? 3 : 1,
       decoration: InputDecoration(
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
         errorText: errorText,
       ),
       onChanged: (value) {

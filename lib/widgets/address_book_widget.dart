@@ -23,13 +23,12 @@ class _AddressBookWidgetState extends State<AddressBookWidget> {
   final List<String> _countries = ['USA', 'Canada', 'India', 'UK', 'Australia'];
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        side: BorderSide(color: Theme.of(context).colorScheme.outline),
-        borderRadius: const BorderRadius.all(Radius.circular(12)),
-      ),
+    return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -76,7 +75,7 @@ class _AddressBookWidgetState extends State<AddressBookWidget> {
                     decoration: InputDecoration(
                       labelText: 'Country',
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 12,
@@ -113,7 +112,7 @@ class _AddressBookWidgetState extends State<AddressBookWidget> {
       keyboardType: isNumber ? TextInputType.number : TextInputType.text,
       decoration: InputDecoration(
         labelText: label,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 12,
           vertical: 12,

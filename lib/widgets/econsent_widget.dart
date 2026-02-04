@@ -80,11 +80,12 @@ class _EConsentWidgetState extends State<EConsentWidget> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Card(
-      elevation: 1,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
           color: _isAccepted
               ? theme.colorScheme.primary
               : theme.colorScheme.outline.withValues(alpha: 0.3),

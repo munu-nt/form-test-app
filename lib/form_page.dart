@@ -37,45 +37,64 @@ class _FormPageState extends State<FormPage> {
 
   Future<void> _submitForm() async {
     final provider = context.read<FormProvider>();
-    
-    // 1. Run provider-level validation (checks all fields, including off-screen ones)
     final errors = provider.validateForm();
 
     if (errors.isNotEmpty) {
       if (!mounted) return;
 
-      // Find the index of the first error
+      final firstError = errors.first;
+      debugPrint('🔍 First validation error: ${firstError.fieldId} - ${firstError.message}');
+
       final visibleFields = provider.visibleFields;
       int firstErrorIndex = -1;
       
       for (int i = 0; i < visibleFields.length; i++) {
-        if (visibleFields[i].fieldId == errors.first.fieldId) {
+        if (visibleFields[i].fieldId == firstError.fieldId) {
           firstErrorIndex = i;
+          debugPrint('✅ Found exact match at index $i');
           break;
+        }
+      }
+      
+      if (firstErrorIndex == -1 && firstError.fieldId.contains('_')) {
+        final parentId = firstError.fieldId.split('_').first;
+        debugPrint('🔍 Trying parent ID: $parentId');
+        for (int i = 0; i < visibleFields.length; i++) {
+          if (visibleFields[i].fieldId == parentId) {
+            firstErrorIndex = i;
+            debugPrint('✅ Found parent match at index $i');
+            break;
+          }
         }
       }
 
       if (firstErrorIndex != -1) {
+        debugPrint('📜 Scrolling to index $firstErrorIndex');
         _itemScrollController.scrollTo(
           index: firstErrorIndex,
           duration: const Duration(milliseconds: 500),
           curve: Curves.easeInOut,
         );
+      } else {
+        debugPrint('⚠️ Could not find field index for: ${firstError.fieldId}');
       }
       
-      // Optional: Add a subtle snackbar if desired, but user asked to "dont show for pop up if invalid"
-      // adhering strictly to "only show after succes" which I assume means "dialog".
-      // Adding a small toast-like snackbar is standard UX so they know WHY it scrolled if they are confused,
-      // but I will respect "dont show... pop up".
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('⚠️ ${firstError.message}'),
+          backgroundColor: Colors.orange.shade700,
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 3),
+          action: SnackBarAction(
+            label: 'OK',
+            textColor: Colors.white,
+            onPressed: () {},
+          ),
+        ),
+      );
       
       return; 
     }
-
-    // 2. Determine if we should proceed with FormState validation (only checks visible widgets)
-    // Since provider validation passed, we know all data is good. 
-    // We can skip _formKey.currentState!.validate() or keep it as a secondary UI check (e.g. focused fields).
-    // It's safer to rely on provider validation for "completeness" and maybe run UI validation for "visual feedback" if needed,
-    // but the error dialog is quite clear. Let's rely on provider logic primarily.
 
     await provider.saveFormData();
     if (!mounted) return;
@@ -157,7 +176,7 @@ class _FormPageState extends State<FormPage> {
     );
     if (confirmed == true) {
       if (!mounted) return;
-      await context.read<FormProvider>().clearData();
+      await context.read<FormProvider>().clearData(DefaultAssetBundle.of(context));
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -181,7 +200,7 @@ class _FormPageState extends State<FormPage> {
               IconButton(
                 icon: const Icon(Icons.delete_forever),
                 tooltip: 'Clear saved data',
-                onPressed: _clearDatabase,
+                onPressed: provider.isLoading ? null : _clearDatabase,
               ),
             ],
           ),
@@ -190,7 +209,7 @@ class _FormPageState extends State<FormPage> {
               : provider.errorMessage != null
                   ? Center(child: Text(provider.errorMessage!))
                   : _buildForm(provider),
-          bottomNavigationBar: provider.formModel != null
+          bottomNavigationBar: provider.formModel != null && !provider.isLoading
               ? Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: FilledButton(

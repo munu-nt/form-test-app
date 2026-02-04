@@ -167,9 +167,6 @@ class _GroupedFieldsWidgetState extends State<GroupedFieldsWidget> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: colorScheme.surfaceContainerHighest.withValues(
-                  alpha: 0.5,
-                ),
                 borderRadius: BorderRadius.vertical(
                   top: const Radius.circular(12),
                   bottom: group.isExpanded
@@ -243,8 +240,9 @@ class _GroupedFieldsWidgetState extends State<GroupedFieldsWidget> {
         children: widget.field.subFields!.asMap().entries.map<Widget>((entry) {
           final subFieldIndex = entry.key;
           final subField = entry.value;
+          final uniqueFieldId = '${widget.field.fieldId}_${groupIndex}_${subField.fieldId}';
           final fieldWithValue = FieldModel(
-            fieldId: subField.fieldId,
+            fieldId: uniqueFieldId,
             fieldName: subField.fieldName,
             fieldType: subField.fieldType,
             fieldValue: group.data[subField.fieldId]?.toString(),
@@ -257,12 +255,12 @@ class _GroupedFieldsWidgetState extends State<GroupedFieldsWidget> {
             hideField: subField.hideField,
           );
           return DynamicFormField(
-            key: Key('${widget.field.fieldId}_${group.id}_${subField.fieldId}'),
+            key: Key(uniqueFieldId),
             field: fieldWithValue,
             formData: group.data,
             displayIndex: subFieldIndex,
             onValueChanged: (fieldId, value) {
-              _handleSubFieldChanged(groupIndex, fieldId, value);
+              _handleSubFieldChanged(groupIndex, subField.fieldId, value);
             },
           );
         }).toList(),
