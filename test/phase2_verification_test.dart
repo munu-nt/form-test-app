@@ -191,7 +191,7 @@ void main() {
 class TestAssetBundle extends CachingAssetBundle {
   @override
   Future<String> loadString(String key, {bool cache = true}) async {
-    print('TestAssetBundle loading key: $key');
+    debugPrint('TestAssetBundle loading key: $key');
     if (key.contains('form-data.json')) {
       return r'''
 {

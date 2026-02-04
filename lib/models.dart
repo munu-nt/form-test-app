@@ -26,8 +26,8 @@ class FormModel {
         try {
           return FieldModel.fromJson(i);
         } catch (e) {
-          print('Error parsing field: ${i['FieldID']} - ${i['FieldName']}');
-          print('Error details: $e');
+          debugPrint('Error parsing field: ${i['FieldID']} - ${i['FieldName']}');
+          debugPrint('Error details: $e');
           return FieldModel(
             fieldId: i['FieldID']?.toString() ?? 'error',
             fieldName: 'Error Parsing Field',

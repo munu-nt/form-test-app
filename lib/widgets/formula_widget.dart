@@ -57,7 +57,9 @@ class _FormulaWidgetState extends State<FormulaWidget> {
           widget.onValueChanged(widget.field.fieldId, resultStr);
         });
       }
-    } catch (e) {}
+    } catch (_) {
+      // Expression evaluation failed, keep previous value
+    }
   }
 
   double _evaluateMathExpression(String expression) {
@@ -65,7 +67,6 @@ class _FormulaWidgetState extends State<FormulaWidget> {
     final terms = <String>[];
     final ops = <String>[];
     int lastIdx = 0;
-    int level = 0;
     for (int i = 0; i < expression.length; i++) {
       String char = expression[i];
       if (char == '+' || char == '-') {
@@ -81,8 +82,9 @@ class _FormulaWidgetState extends State<FormulaWidget> {
       double nextVal = _evaluateTerm(terms[i + 1]);
       if (ops[i] == '+') {
         total += nextVal;
-      } else if (ops[i] == '-')
+      } else if (ops[i] == '-') {
         total -= nextVal;
+      }
     }
     return total;
   }
@@ -124,7 +126,7 @@ class _FormulaWidgetState extends State<FormulaWidget> {
           filled: true,
           fillColor: Theme.of(
             context,
-          ).colorScheme.surfaceContainerHighest.withOpacity(0.5),
+          ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
         ),
       ),
     );

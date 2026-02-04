@@ -11,7 +11,6 @@ class StaticImageView extends StatefulWidget {
 
 class _StaticImageViewState extends State<StaticImageView> {
   bool _isLoading = true;
-  bool _hasError = false;
   @override
   Widget build(BuildContext context) {
     final imageUrl = widget.field.fieldValue ?? '';

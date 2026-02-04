@@ -21,7 +21,6 @@ class _GpsLocationWidgetState extends State<GpsLocationWidget> {
   LocationData? _location;
   bool _isLoading = false;
   String? _errorMessage;
-  LocationPermission? _permission;
   final MapController _mapController = MapController();
   bool _isMapReady = false;
   @override
@@ -34,11 +33,8 @@ class _GpsLocationWidgetState extends State<GpsLocationWidget> {
 
   Future<void> _checkPermission() async {
     try {
-      final permission = await Geolocator.checkPermission();
+      await Geolocator.checkPermission();
       if (!mounted) return;
-      setState(() {
-        _permission = permission;
-      });
     } catch (e) {
       debugPrint('Check permission error: $e');
     }
@@ -70,7 +66,6 @@ class _GpsLocationWidgetState extends State<GpsLocationWidget> {
         if (permission == LocationPermission.denied) {
           setState(() {
             _errorMessage = 'Location permission denied by user.';
-            _permission = permission;
             _isLoading = false;
           });
           return;
@@ -80,14 +75,10 @@ class _GpsLocationWidgetState extends State<GpsLocationWidget> {
         setState(() {
           _errorMessage =
               'Location permissions are permanently denied. Please enable in app settings.';
-          _permission = permission;
           _isLoading = false;
         });
         return;
       }
-      setState(() {
-        _permission = permission;
-      });
       if (!mounted) return;
       await _getCurrentLocation();
     } catch (e, stack) {

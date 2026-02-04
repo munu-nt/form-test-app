@@ -176,7 +176,7 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
   }
 
   Widget _buildLabel() {
-    final displayIdx = widget.displayIndex;
+    // displayIndex is available via widget.displayIndex if needed
     return Row(
       children: [
         /*
@@ -451,11 +451,7 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
           inputType: TextInputType.emailAddress,
           key: Key(widget.field.fieldId),
         );
-      case 'PhoneBook':
-        return _buildTextField(
-          inputType: TextInputType.phone,
-          key: Key(widget.field.fieldId),
-        );
+      // PhoneBook is handled in ComplexFieldWidget above
       case 'WebUrl':
         return _buildTextField(
           inputType: TextInputType.url,

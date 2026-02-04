@@ -43,7 +43,6 @@ class _StaticWebWidgetState extends State<StaticWebWidget> {
   }
 
   bool _isUrl(String s) => s.startsWith('http://') || s.startsWith('https://');
-  bool _isHtml(String s) => s.contains('<') && s.contains('>');
   @override
   Widget build(BuildContext context) {
     final content = widget.field.fieldValue ?? '';
