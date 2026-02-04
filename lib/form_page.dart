@@ -1,9 +1,8 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:test_1/database_helper.dart';
+import 'package:provider/provider.dart';
 import 'package:test_1/form_widgets.dart';
-import 'package:test_1/models.dart';
+import 'package:test_1/providers/form_provider.dart';
 
 class FormPage extends StatefulWidget {
   const FormPage({super.key});
@@ -12,48 +11,15 @@ class FormPage extends StatefulWidget {
 }
 
 class _FormPageState extends State<FormPage> {
-  FormModel? _formModel;
-  bool _isLoading = true;
-  String? _errorMessage;
-  final Map<String, dynamic> _formData = {};
   final _formKey = GlobalKey<FormState>();
-  bool _isDataLoaded = false;
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (!_isDataLoaded) {
-      _loadFormData();
-      _isDataLoaded = true;
-    }
-  }
 
-  Future<void> _loadFormData() async {
-    try {
-      final String response = await DefaultAssetBundle.of(
-        context,
-      ).loadString('data/form-data.json');
-      final data = json.decode(response);
-      setState(() {
-        _formModel = FormModel.fromJson(data);
-        if (_formModel != null) {
-          String name = _formModel!.formName;
-          name = name.replaceAll(RegExp(r'\d{1,2}-[A-Za-z]{3}-\d{4}\s*'), '');
-          name = name.replaceAll(RegExp(r'\s*\[.*?\]\s*'), '');
-          name = name.trim();
-          if (name.isEmpty) name = 'Dynamic Form';
-          _formModel = FormModel(
-            status: _formModel!.status,
-            errorType: _formModel!.errorType,
-            formName: name,
-            formCategory: _formModel!.formCategory,
-            buttonType: _formModel!.buttonType,
-            fields: _formModel!.fields,
-          );
-        }
-      });
-      final savedData = await DatabaseHelper.loadFormData();
-      if (savedData.isNotEmpty && mounted) {
-        _formData.addAll(savedData);
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final provider = context.read<FormProvider>();
+      await provider.loadFormData(DefaultAssetBundle.of(context));
+      if (provider.formData.isNotEmpty && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('📥 Previously saved data restored'),
@@ -63,26 +29,13 @@ class _FormPageState extends State<FormPage> {
           ),
         );
       }
-      setState(() {
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _errorMessage = 'Failed to load form data: $e';
-        _isLoading = false;
-      });
-    }
-  }
-
-  void _handleValueChanged(String fieldId, dynamic value) {
-    setState(() {
-      _formData[fieldId] = value;
     });
   }
 
   Future<void> _submitForm() async {
+    final provider = context.read<FormProvider>();
     if (_formKey.currentState!.validate()) {
-      await DatabaseHelper.saveFormData(_formData);
+      await provider.saveFormData();
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -118,7 +71,7 @@ class _FormPageState extends State<FormPage> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Text(const JsonEncoder.withIndent('  ').convert(_formData)),
+                Text(const JsonEncoder.withIndent('  ').convert(provider.formData)),
               ],
             ),
           ),
@@ -164,11 +117,9 @@ class _FormPageState extends State<FormPage> {
       ),
     );
     if (confirmed == true) {
-      await DatabaseHelper.clearFormData();
       if (!mounted) return;
-      setState(() {
-        _formData.clear();
-      });
+      await context.read<FormProvider>().clearData();
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('🗑️ All saved data cleared'),
@@ -181,69 +132,47 @@ class _FormPageState extends State<FormPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_formModel?.formName ?? 'Loading...'),
-        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.delete_forever),
-            tooltip: 'Clear saved data',
-            onPressed: _clearDatabase,
-          ),
-        ],
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _errorMessage != null
-          ? Center(child: Text(_errorMessage!))
-          : _buildForm(),
-      bottomNavigationBar: _formModel != null
-          ? Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: FilledButton(
-                onPressed: _submitForm,
-                style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-                child: Text(_formModel!.buttonType),
+    return Consumer<FormProvider>(
+      builder: (context, provider, child) {
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(provider.formModel?.formName ?? 'Loading...'),
+            backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.delete_forever),
+                tooltip: 'Clear saved data',
+                onPressed: _clearDatabase,
               ),
-            )
-          : null,
+            ],
+          ),
+          body: provider.isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : provider.errorMessage != null
+                  ? Center(child: Text(provider.errorMessage!))
+                  : _buildForm(provider),
+          bottomNavigationBar: provider.formModel != null
+              ? Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: FilledButton(
+                    onPressed: _submitForm,
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    child: Text(provider.formModel!.buttonType),
+                  ),
+                )
+              : null,
+        );
+      },
     );
   }
 
-  Widget _buildForm() {
-    if (_formModel == null) return const SizedBox.shrink();
-    final fields = _formModel!.fields;
-    final complexTypes = {
-      'AddressBook',
-      'EmergencyContact',
-      'PhoneBook',
-      'ProgramContactProfile',
-      'ProgramProfile',
-      'UserProfile',
-    };
-    final complexIds = fields
-        .where((f) => complexTypes.contains(f.fieldType))
-        .map((f) => f.fieldId)
-        .toSet();
-    debugPrint('Total fields loaded: ${fields.length}');
-    debugPrint('Complex Container IDs found: ${complexIds.length}');
-    final filteredFields = fields.where((f) {
-      if (complexIds.contains(f.fieldId)) {
-        if (!complexTypes.contains(f.fieldType)) {
-          return false;
-        }
-        return true;
-      }
-      if (f.isGroupedField) {
-        if (f.fieldType == 'GroupedFields') return true;
-        return false;
-      }
-      return true;
-    }).toList();
-    debugPrint('Fields after filtering: ${filteredFields.length}');
+  Widget _buildForm(FormProvider provider) {
+    if (provider.formModel == null) return const SizedBox.shrink();
+    
+    final filteredFields = provider.visibleFields;
+    
     return Form(
       key: _formKey,
       child: ListView.builder(
@@ -252,10 +181,10 @@ class _FormPageState extends State<FormPage> {
         itemBuilder: (context, index) {
           return DynamicFormField(
             field: filteredFields[index],
-            onValueChanged: _handleValueChanged,
-            formData: _formData,
+            onValueChanged: provider.updateValue,
+            formData: provider.formData,
             displayIndex: index,
-            allFields: fields,
+            allFields: provider.formModel!.fields,
           );
         },
       ),
