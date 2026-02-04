@@ -58,7 +58,7 @@ class _FormulaWidgetState extends State<FormulaWidget> {
         });
       }
     } catch (_) {
-      // Expression evaluation failed, keep previous value
+      
     }
   }
 

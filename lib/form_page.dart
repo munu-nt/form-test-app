@@ -35,7 +35,7 @@ class _FormPageState extends State<FormPage> {
   Future<void> _submitForm() async {
     final provider = context.read<FormProvider>();
     
-    // 1. Run provider-level validation (checks all fields, including off-screen ones)
+    
     final errors = provider.validateForm();
 
     if (errors.isNotEmpty) {
@@ -81,11 +81,11 @@ class _FormPageState extends State<FormPage> {
       return; 
     }
 
-    // 2. Determine if we should proceed with FormState validation (only checks visible widgets)
-    // Since provider validation passed, we know all data is good. 
-    // We can skip _formKey.currentState!.validate() or keep it as a secondary UI check (e.g. focused fields).
-    // It's safer to rely on provider validation for "completeness" and maybe run UI validation for "visual feedback" if needed,
-    // but the error dialog is quite clear. Let's rely on provider logic primarily.
+    
+    
+    
+    
+    
 
     await provider.saveFormData();
     if (!mounted) return;
