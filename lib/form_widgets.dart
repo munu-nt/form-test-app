@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:test_1/providers/form_provider.dart';
 import 'models.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'widgets/appointment_widget.dart';
@@ -185,6 +187,11 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
   @override
   Widget build(BuildContext context) {
     if (widget.field.hideField) return const SizedBox.shrink();
+    
+    // Watch provider to rebuild when error state changes
+    final provider = context.watch<FormProvider>();
+    final errorText = provider.getFieldError(widget.field.fieldId);
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       child: Column(
@@ -195,7 +202,7 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
               widget.field.fieldType != 'HtmlViewer')
             _buildLabel(),
           const SizedBox(height: 8),
-          _buildInput(),
+          _buildInput(errorText), // Pass errorText to input builder
         ],
       ),
     );
@@ -262,7 +269,7 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
     );
   }
 
-  Widget _buildInput() {
+  Widget _buildInput(String? errorText) {
     if (widget.field.fieldType == 'GroupedFields') {
       return GroupedFieldsWidget(
         key: Key(widget.field.fieldId),
@@ -282,15 +289,22 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
         );
       }
       if (widget.field.fieldType == 'CheckBox') {
-        return CheckBoxWidget(
-          key: Key(widget.field.fieldId),
-          field: widget.field,
-          onValueChanged: widget.onValueChanged,
-          formData: widget.formData,
+        return InputDecorator(
+          decoration: InputDecoration(
+            errorText: errorText,
+            border: InputBorder.none,
+            contentPadding: EdgeInsets.zero,
+          ),
+          child: CheckBoxWidget(
+            key: Key(widget.field.fieldId),
+            field: widget.field,
+            onValueChanged: widget.onValueChanged,
+            formData: widget.formData,
+          ),
         );
       }
       if (widget.field.fieldType == 'RadioButton') {
-        return _buildRadioButton();
+        return _buildRadioButton(errorText);
       }
       if ([
         'AcademicSchool',
@@ -332,18 +346,27 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
           onValueChanged: (val) {
             setState(() => _dropdownValue = val);
             widget.onValueChanged(widget.field.fieldId, val);
+            // Clear error on change
+             context.read<FormProvider>().updateValue(widget.field.fieldId, val);
           },
         );
       }
-      return _buildDropdown();
+      return _buildDropdown(errorText);
     }
     switch (widget.field.fieldType) {
       case 'Rating':
-        return StarRating(
-          key: Key(widget.field.fieldId),
-          field: widget.field,
-          onValueChanged: widget.onValueChanged,
-          formData: widget.formData,
+        return InputDecorator(
+          decoration: InputDecoration(
+            errorText: errorText,
+            border: InputBorder.none,
+            contentPadding: EdgeInsets.zero,
+          ),
+          child: StarRating(
+            key: Key(widget.field.fieldId),
+            field: widget.field,
+            onValueChanged: widget.onValueChanged,
+            formData: widget.formData,
+          ),
         );
       case 'Divider':
         return _buildDivider();
@@ -352,16 +375,30 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
       case 'LikeUnlike':
         return _buildLikeUnlike();
       case 'FileUpload':
-        return FileUploadWidget(
-          key: Key(widget.field.fieldId),
-          field: widget.field,
-          onValueChanged: widget.onValueChanged,
+        return InputDecorator(
+          decoration: InputDecoration(
+            errorText: errorText,
+            border: InputBorder.none,
+            contentPadding: EdgeInsets.zero,
+          ),
+          child: FileUploadWidget(
+            key: Key(widget.field.fieldId),
+            field: widget.field,
+            onValueChanged: widget.onValueChanged,
+          ),
         );
       case 'MultiFileUpload':
-        return MultiFileUploadWidget(
-          key: Key(widget.field.fieldId),
-          field: widget.field,
-          onValueChanged: widget.onValueChanged,
+        return InputDecorator(
+          decoration: InputDecoration(
+            errorText: errorText,
+            border: InputBorder.none,
+            contentPadding: EdgeInsets.zero,
+          ),
+          child: MultiFileUploadWidget(
+            key: Key(widget.field.fieldId),
+            field: widget.field,
+            onValueChanged: widget.onValueChanged,
+          ),
         );
       case 'Image':
         if (widget.field.fieldId == '5778') {
@@ -370,23 +407,44 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
             field: widget.field,
           );
         }
-        return ImagePickerWidget(
-          key: Key(widget.field.fieldId),
-          field: widget.field,
-          onValueChanged: widget.onValueChanged,
+        return InputDecorator(
+          decoration: InputDecoration(
+            errorText: errorText,
+            border: InputBorder.none,
+            contentPadding: EdgeInsets.zero,
+          ),
+          child: ImagePickerWidget(
+            key: Key(widget.field.fieldId),
+            field: widget.field,
+            onValueChanged: widget.onValueChanged,
+          ),
         );
       case 'Video':
-        return VideoPickerWidget(
-          key: Key(widget.field.fieldId),
-          field: widget.field,
-          onValueChanged: widget.onValueChanged,
+        return InputDecorator(
+          decoration: InputDecoration(
+            errorText: errorText,
+            border: InputBorder.none,
+            contentPadding: EdgeInsets.zero,
+          ),
+          child: VideoPickerWidget(
+            key: Key(widget.field.fieldId),
+            field: widget.field,
+            onValueChanged: widget.onValueChanged,
+          ),
         );
       case 'DigiSign':
-        return DigitalSignatureWidget(
-          key: Key(widget.field.fieldId),
-          field: widget.field,
-          onValueChanged: widget.onValueChanged,
-          formData: widget.formData,
+        return InputDecorator(
+          decoration: InputDecoration(
+            errorText: errorText,
+            border: InputBorder.none,
+            contentPadding: EdgeInsets.zero,
+          ),
+          child: DigitalSignatureWidget(
+            key: Key(widget.field.fieldId),
+            field: widget.field,
+            onValueChanged: widget.onValueChanged,
+            formData: widget.formData,
+          ),
         );
       case 'Discount':
         return DiscountWidget(
@@ -410,10 +468,17 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
           onValueChanged: widget.onValueChanged,
         );
       case 'MultiWebUrl':
-        return MultiWebUrlWidget(
-          key: Key(widget.field.fieldId),
-          field: widget.field,
-          onValueChanged: widget.onValueChanged,
+        return InputDecorator(
+          decoration: InputDecoration(
+            errorText: errorText,
+            border: InputBorder.none,
+            contentPadding: EdgeInsets.zero,
+          ),
+          child: MultiWebUrlWidget(
+            key: Key(widget.field.fieldId),
+            field: widget.field,
+            onValueChanged: widget.onValueChanged,
+          ),
         );
       case 'EmergencyContact':
       case 'UserProfile':
@@ -434,29 +499,57 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
           onValueChanged: widget.onValueChanged,
         );
       case 'eConsent':
-        return EConsentWidget(
-          key: Key(widget.field.fieldId),
-          field: widget.field,
-          onValueChanged: widget.onValueChanged,
+        return InputDecorator(
+          decoration: InputDecoration(
+            errorText: errorText,
+            border: InputBorder.none,
+            contentPadding: EdgeInsets.zero,
+          ),
+          child: EConsentWidget(
+            key: Key(widget.field.fieldId),
+            field: widget.field,
+            onValueChanged: widget.onValueChanged,
+          ),
         );
       case 'GPSLocation':
-        return GpsLocationWidget(
-          key: Key(widget.field.fieldId),
-          field: widget.field,
-          onValueChanged: widget.onValueChanged,
+        return InputDecorator(
+          decoration: InputDecoration(
+            errorText: errorText,
+            border: InputBorder.none,
+            contentPadding: EdgeInsets.zero,
+          ),
+          child: GpsLocationWidget(
+            key: Key(widget.field.fieldId),
+            field: widget.field,
+            onValueChanged: widget.onValueChanged,
+          ),
         );
       case 'GeographicMap':
-        return MapPickerWidget(
-          key: Key(widget.field.fieldId),
-          field: widget.field,
-          onValueChanged: widget.onValueChanged,
+        return InputDecorator(
+          decoration: InputDecoration(
+            errorText: errorText,
+            border: InputBorder.none,
+            contentPadding: EdgeInsets.zero,
+          ),
+          child: MapPickerWidget(
+            key: Key(widget.field.fieldId),
+            field: widget.field,
+            onValueChanged: widget.onValueChanged,
+          ),
         );
       case 'CheckBox':
-        return CheckBoxWidget(
-          key: Key(widget.field.fieldId),
-          field: widget.field,
-          onValueChanged: widget.onValueChanged,
-          formData: widget.formData,
+        return InputDecorator(
+          decoration: InputDecoration(
+            errorText: errorText,
+            border: InputBorder.none,
+            contentPadding: EdgeInsets.zero,
+          ),
+          child: CheckBoxWidget(
+            key: Key(widget.field.fieldId),
+            field: widget.field,
+            onValueChanged: widget.onValueChanged,
+            formData: widget.formData,
+          ),
         );
       case 'WebView':
       case 'web_view':
@@ -470,34 +563,44 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
         return _buildTextField(isTextArea: true);
       case 'InputBox':
       case 'TextBox':
-        return _buildTextField(key: Key(widget.field.fieldId));
+        return _buildTextField(key: Key(widget.field.fieldId), errorText: errorText);
       case 'Email':
       case 'EmailID':
         return _buildTextField(
           inputType: TextInputType.emailAddress,
           key: Key(widget.field.fieldId),
+          errorText: errorText,
         );
       
       case 'WebUrl':
         return _buildTextField(
           inputType: TextInputType.url,
           key: Key(widget.field.fieldId),
+          errorText: errorText,
         );
       case 'PostalCode':
         return _buildTextField(
           inputType: TextInputType.number,
           key: Key(widget.field.fieldId),
+          errorText: errorText,
         );
       case 'Time':
-        return _buildTimePicker();
+        return _buildTimePicker(errorText);
       case 'ArrivalDate':
       case 'Calendar':
       case 'DateTime':
-        return DatePickerWidget(
-          key: Key(widget.field.fieldId),
-          field: widget.field,
-          onValueChanged: widget.onValueChanged,
-          formData: widget.formData,
+        return InputDecorator(
+          decoration: InputDecoration(
+            errorText: errorText,
+            border: InputBorder.none,
+            contentPadding: EdgeInsets.zero,
+          ),
+          child: DatePickerWidget(
+            key: Key(widget.field.fieldId),
+            field: widget.field,
+            onValueChanged: widget.onValueChanged,
+            formData: widget.formData,
+          ),
         );
       case 'AddressBook':
         return AddressBookWidget(
@@ -505,9 +608,16 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
           onValueChanged: widget.onValueChanged,
         );
       case 'AppointmentCalendar':
-        return AppointmentWidget(
-          field: widget.field,
-          onValueChanged: widget.onValueChanged,
+        return InputDecorator(
+          decoration: InputDecoration(
+            errorText: errorText,
+            border: InputBorder.none,
+            contentPadding: EdgeInsets.zero,
+          ),
+          child: AppointmentWidget(
+            field: widget.field,
+            onValueChanged: widget.onValueChanged,
+          ),
         );
       case 'GroupedFields':
         return GroupedFieldsWidget(
@@ -517,7 +627,7 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
           onValueChanged: widget.onValueChanged,
         );
       default:
-        return _buildTextField();
+        return _buildTextField(errorText: errorText);
     }
   }
 
@@ -588,9 +698,15 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
     );
   }
 
-  Widget _buildRadioButton() {
-    return Column(
-      children: widget.field.fieldOptions!.map((option) {
+  Widget _buildRadioButton(String? errorText) {
+    return InputDecorator(
+      decoration: InputDecoration(
+        errorText: errorText,
+        border: InputBorder.none,
+        contentPadding: EdgeInsets.zero,
+      ),
+      child: Column(
+        children: widget.field.fieldOptions!.map((option) {
         
         return RadioListTile<String>(
           title: Text(option.text),
@@ -612,17 +728,15 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
                 },
         );
       }).toList(),
+      ),
     );
   }
 
-  Widget _buildDropdown() {
+  Widget _buildDropdown(String? errorText) {
     return DropdownButtonFormField<String>(
       decoration: InputDecoration(
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        filled: true,
-        fillColor: Theme.of(
-          context,
-        ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+        errorText: errorText,
       ),
       initialValue: _dropdownValue,
       isExpanded: true,
@@ -647,7 +761,7 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
     );
   }
 
-  Widget _buildTimePicker() {
+  Widget _buildTimePicker(String? errorText) {
     return GestureDetector(
       onTap: widget.field.isReadOnly
           ? null
@@ -671,11 +785,8 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
           validator: _validateField,
           decoration: InputDecoration(
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-            filled: true,
-            fillColor: Theme.of(
-              context,
-            ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
             suffixIcon: const Icon(Icons.access_time),
+            errorText: errorText,
           ),
         ),
       ),
@@ -686,6 +797,7 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
     bool isTextArea = false,
     TextInputType? inputType,
     Key? key,
+    String? errorText,
   }) {
     return TextFormField(
       key: key,
@@ -696,10 +808,7 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
       maxLines: isTextArea || widget.field.fieldType == 'AddressBook' ? 3 : 1,
       decoration: InputDecoration(
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        filled: true,
-        fillColor: Theme.of(
-          context,
-        ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+        errorText: errorText,
       ),
       onChanged: (value) {
         widget.onValueChanged(widget.field.fieldId, value);

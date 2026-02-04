@@ -89,8 +89,21 @@ class FormProvider extends ChangeNotifier {
     }
   }
 
+  final Map<String, String> _fieldErrors = {};
+  Map<String, String> get fieldErrors => _fieldErrors;
+  
+  String? getFieldError(String fieldId) => _fieldErrors[fieldId];
+
+  void clearErrors() {
+    _fieldErrors.clear();
+    notifyListeners();
+  }
+
   void updateValue(String fieldId, dynamic value) {
     _formData[fieldId] = value;
+    if (_fieldErrors.containsKey(fieldId)) {
+      _fieldErrors.remove(fieldId);
+    }
     notifyListeners();
   }
 
@@ -102,12 +115,15 @@ class FormProvider extends ChangeNotifier {
   Future<void> clearData() async {
     await DatabaseHelper.clearFormData();
     _formData.clear();
+    _fieldErrors.clear();
     notifyListeners();
   }
 
-  List<String> validateForm() {
-    final List<String> errors = [];
+  List<ValidationError> validateForm() {
+    final List<ValidationError> errors = [];
     final fieldsToCheck = visibleFields;
+
+    _fieldErrors.clear(); // Clear previous errors before validation run
 
     for (final field in fieldsToCheck) {
       if (field.isReadOnly) continue;
@@ -115,31 +131,58 @@ class FormProvider extends ChangeNotifier {
       final value = _formData[field.fieldId];
       final exists = value != null && value.toString().trim().isNotEmpty;
 
-      
+      // 1. Mandatory Check
       if (field.isMandate && !exists) {
-        errors.add('${field.fieldName} is required');
+        final error = ValidationError(
+          fieldId: field.fieldId,
+          message: '${field.fieldName} is required',
+        );
+        errors.add(error);
+        _fieldErrors[field.fieldId] = error.message;
         continue;
       }
 
-      
+      // 2. Format Checks (Email)
       if (exists && (field.fieldType == 'Email' || field.fieldType == 'EmailID')) {
         final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
         if (!emailRegex.hasMatch(value.toString())) {
-          errors.add('${field.fieldName}: Invalid email address');
+          final error = ValidationError(
+            fieldId: field.fieldId,
+            message: '${field.fieldName}: Invalid email address',
+          );
+          errors.add(error);
+          _fieldErrors[field.fieldId] = error.message;
         }
       }
 
-      
+      // 3. Format Checks (Postal Code - US Only logic copied from widget)
       if (exists && field.fieldType == 'PostalCode') {
-        
+        // Assuming '2005' is the Country field ID as per widget logic
         String? countryValue = _formData['2005']; 
         if (countryValue == 'US') {
           if (!RegExp(r'^\d{5}(?:[-\s]\d{4})?$').hasMatch(value.toString())) {
-             errors.add('${field.fieldName}: Invalid US Postal Code');
+             final error = ValidationError(
+               fieldId: field.fieldId,
+               message: '${field.fieldName}: Invalid US Postal Code',
+             );
+             errors.add(error);
+             _fieldErrors[field.fieldId] = error.message;
           }
         }
       }
     }
+    
+    if (errors.isNotEmpty) {
+      notifyListeners(); // Notify to update UI with errors
+    }
+    
     return errors;
   }
+}
+
+class ValidationError {
+  final String fieldId;
+  final String message;
+  
+  ValidationError({required this.fieldId, required this.message});
 }

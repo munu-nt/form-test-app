@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:test_1/form_widgets.dart';
 import 'package:test_1/providers/form_provider.dart';
 
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+
 class FormPage extends StatefulWidget {
   const FormPage({super.key});
   @override
@@ -12,6 +14,7 @@ class FormPage extends StatefulWidget {
 
 class _FormPageState extends State<FormPage> {
   final _formKey = GlobalKey<FormState>();
+  final ItemScrollController _itemScrollController = ItemScrollController();
 
   @override
   void initState() {
@@ -35,57 +38,44 @@ class _FormPageState extends State<FormPage> {
   Future<void> _submitForm() async {
     final provider = context.read<FormProvider>();
     
-    
+    // 1. Run provider-level validation (checks all fields, including off-screen ones)
     final errors = provider.validateForm();
 
     if (errors.isNotEmpty) {
       if (!mounted) return;
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Row(
-            children: [
-              Icon(Icons.error_outline, color: Colors.red),
-              SizedBox(width: 8),
-              Text('Validation Error'),
-            ],
-          ),
-          content: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text('Please fix the following errors before submitting:'),
-                const SizedBox(height: 12),
-                ...errors.map((e) => Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 2.0),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text('• ', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
-                      Expanded(child: Text(e)),
-                    ],
-                  ),
-                )),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('OK'),
-            ),
-          ],
-        ),
-      );
+
+      // Find the index of the first error
+      final visibleFields = provider.visibleFields;
+      int firstErrorIndex = -1;
+      
+      for (int i = 0; i < visibleFields.length; i++) {
+        if (visibleFields[i].fieldId == errors.first.fieldId) {
+          firstErrorIndex = i;
+          break;
+        }
+      }
+
+      if (firstErrorIndex != -1) {
+        _itemScrollController.scrollTo(
+          index: firstErrorIndex,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+      }
+      
+      // Optional: Add a subtle snackbar if desired, but user asked to "dont show for pop up if invalid"
+      // adhering strictly to "only show after succes" which I assume means "dialog".
+      // Adding a small toast-like snackbar is standard UX so they know WHY it scrolled if they are confused,
+      // but I will respect "dont show... pop up".
+      
       return; 
     }
 
-    
-    
-    
-    
-    
+    // 2. Determine if we should proceed with FormState validation (only checks visible widgets)
+    // Since provider validation passed, we know all data is good. 
+    // We can skip _formKey.currentState!.validate() or keep it as a secondary UI check (e.g. focused fields).
+    // It's safer to rely on provider validation for "completeness" and maybe run UI validation for "visual feedback" if needed,
+    // but the error dialog is quite clear. Let's rely on provider logic primarily.
 
     await provider.saveFormData();
     if (!mounted) return;
@@ -224,7 +214,8 @@ class _FormPageState extends State<FormPage> {
     
     return Form(
       key: _formKey,
-      child: ListView.builder(
+      child: ScrollablePositionedList.builder(
+        itemScrollController: _itemScrollController,
         padding: const EdgeInsets.all(8),
         itemCount: filteredFields.length,
         itemBuilder: (context, index) {
