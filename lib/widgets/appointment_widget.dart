@@ -470,7 +470,7 @@ class _AppointmentWidgetState extends State<AppointmentWidget> {
           decoration: InputDecoration(
             labelText: 'Campus',
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-            prefixIcon: Icon(Icons.business),
+            prefixIcon: const Icon(Icons.business),
           ),
           initialValue: _selectedCampus,
           items: [
@@ -490,7 +490,7 @@ class _AppointmentWidgetState extends State<AppointmentWidget> {
           decoration: InputDecoration(
             labelText: 'Description',
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-            prefixIcon: Icon(Icons.description),
+            prefixIcon: const Icon(Icons.description),
           ),
           maxLines: 2,
           onChanged: (_) => _updateValue(),
@@ -501,7 +501,7 @@ class _AppointmentWidgetState extends State<AppointmentWidget> {
           decoration: InputDecoration(
             labelText: 'Reason for Appointment',
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-            prefixIcon: Icon(Icons.help_outline),
+            prefixIcon: const Icon(Icons.help_outline),
           ),
           onChanged: (_) => _updateValue(),
         ),
@@ -511,7 +511,7 @@ class _AppointmentWidgetState extends State<AppointmentWidget> {
           decoration: InputDecoration(
             labelText: 'Contact Email',
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-            prefixIcon: Icon(Icons.email),
+            prefixIcon: const Icon(Icons.email),
           ),
           keyboardType: TextInputType.emailAddress,
           onChanged: (_) => _updateValue(),

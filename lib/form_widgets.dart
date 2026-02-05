@@ -746,24 +746,23 @@ class _DynamicFormFieldState extends State<DynamicFormField> {
         focusedErrorBorder: InputBorder.none,
         contentPadding: EdgeInsets.zero,
       ),
-      child: Column(
-        children: widget.field.fieldOptions!.map((option) {
-        return RadioListTile<String>(
-          title: Text(option.text),
-          value: option.value,
-          groupValue: _dropdownValue,
-          onChanged: widget.field.isReadOnly
-              ? null
-              : (value) {
-                  if (value != null) {
-                    setState(() {
-                      _dropdownValue = value;
-                    });
-                    widget.onValueChanged(widget.field.fieldId, value);
-                  }
-                },
-        );
-      }).toList(),
+      child: RadioGroup<String>(
+        groupValue: _dropdownValue,
+        onChanged: (String? value) {
+          if (widget.field.isReadOnly) return;
+          setState(() {
+            _dropdownValue = value;
+          });
+          widget.onValueChanged(widget.field.fieldId, value);
+        },
+        child: Column(
+          children: widget.field.fieldOptions!.map((option) {
+            return RadioListTile<String>(
+              title: Text(option.text),
+              value: option.value,
+            );
+          }).toList(),
+        ),
       ),
     );
   }
